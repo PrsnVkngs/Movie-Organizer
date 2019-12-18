@@ -1,0 +1,1 @@
+Before running "main.py", run "installimdbpy.bat" and it will automatically install IMDbPy if it is not already installed.
