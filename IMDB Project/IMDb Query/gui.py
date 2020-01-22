@@ -9,10 +9,10 @@ import shutil
 
 from get_functions import *
 
-# title, release date, runtime, director, starrating, mpaarating, cast, reviews, genre
+# title, release date, runtime, director, starrating, mpaarating, cast, plot, genre
 noFields = 9
 prefs = ['true'] * noFields
-prefName = ['Title', 'Release date', 'Runtime', 'Director', 'Star Rating', 'MPAA Rating', 'Cast', 'Reviews', 'Genre']
+prefName = ['Title', 'Release date', 'Runtime', 'Director', 'Star Rating', 'MPAA Rating', 'Cast', 'Plot', 'Genre']
 
 config_names = ['fieldprefs', 'srcfolder', 'destfolder']
 
@@ -53,7 +53,7 @@ def close_window(window):
     gc.collect()
 
 
-def changePrefs(parent, titlePref, releasePref, runtimePref, directorPref, starRatingPref, mpaaRatingPref, castPref, reviewsPref, fieldPrefs, genrePref, selectedProfile):
+def changePrefs(parent, titlePref, releasePref, runtimePref, directorPref, starRatingPref, mpaaRatingPref, castPref, plotPref, fieldPrefs, genrePref, selectedProfile):
     prefsWindow = Toplevel(parent)
     prefsWindow.title("Select new search preferences")
     prefFrame = ttk.Frame(prefsWindow, padding="5 5 15 15")
@@ -76,7 +76,7 @@ def changePrefs(parent, titlePref, releasePref, runtimePref, directorPref, starR
                     variable=mpaaRatingPref, onvalue='true', offvalue='false').grid(column=3, row=2, sticky=W)
     ttk.Checkbutton(prefFrame, text='Cast', command=lambda: updatePrefs(6, castPref.get()), variable=castPref,
                     onvalue='true', offvalue='false').grid(column=1, row=3, sticky=W)
-    ttk.Checkbutton(prefFrame, text='Reviews', command=lambda: updatePrefs(7, reviewsPref.get()), variable=reviewsPref,
+    ttk.Checkbutton(prefFrame, text='Plot', command=lambda: updatePrefs(7, plotPref.get()), variable=plotPref,
                     onvalue='true', offvalue='false').grid(column=2, row=3, sticky=W)
     ttk.Checkbutton(prefFrame, text = 'Genre', command = lambda: updatePrefs(8, genrePref.get()), variable = genrePref,
                     onvalue = 'true', offvalue = 'false').grid(column = 3, row = 3, sticky = W)
@@ -220,6 +220,8 @@ def addProfile():
     print("Profile Added")
 
 def view_movie_data():
+    movie = 'the matrix'
+    print(get_all_data(movie))
     print("wip")
 
 def updateLabels(labels, current):
@@ -249,7 +251,7 @@ def makeGUI():
     starRatingPref = StringVar()  # 4
     mpaaRatingPref = StringVar()  # 5
     castPref = StringVar()  # 6
-    reviewsPref = StringVar()  # 7
+    plotPref = StringVar()  # 7
     genrePref = StringVar() # 8
 
     titlePref.set('true')
@@ -259,7 +261,7 @@ def makeGUI():
     starRatingPref.set('true')
     mpaaRatingPref.set('true')
     castPref.set('true')
-    reviewsPref.set('true')
+    plotPref.set('true')
     genrePref.set('true')
 
     sourceFolder = StringVar('')
@@ -289,7 +291,7 @@ def makeGUI():
     ttk.Label(mainframe, text = "Search Preferences:").grid(column = 1, row = 1, sticky = W)
     ttk.Label(mainframe, textvariable=fieldPreferences).grid(column=2, row=1, sticky=W)  # query preferences
     ttk.Button(mainframe, text="Change",
-               command=lambda: changePrefs(root, titlePref, releasePref, runtimePref, directorPref, starRatingPref, mpaaRatingPref, castPref, reviewsPref, fieldPreferences, genrePref, userProfile.current())).grid(column=4, row=1, sticky=W)  # change prefs
+               command=lambda: changePrefs(root, titlePref, releasePref, runtimePref, directorPref, starRatingPref, mpaaRatingPref, castPref, plotPref, fieldPreferences, genrePref, userProfile.current())).grid(column=4, row=1, sticky=W)  # change prefs
 
     ttk.Label(mainframe, text = "Source Folder:").grid(column = 1, row = 2, sticky = W)
     ttk.Label(mainframe, textvariable=sourceFolder).grid(column=2, row=2, sticky=W)  # source folder
@@ -315,6 +317,8 @@ def makeGUI():
         updateLabels(old_labels, current_profile)
     
     userProfile.bind('<<ComboboxSelected>>', call_update_labels)
+
+    ttk.Button(mainframe, text = "View Movie Data", command = view_movie_data).grid(row = 4, column = 2, sticky = W)
 
     ttk.Button(mainframe, text="Add Profile", command=addProfile).grid(column=4, row=4,
                                                                        sticky=W)  # add user profile button
