@@ -1,3 +1,7 @@
+#this program is intended to generate empty files -
+#with the name of a popular movie in order to test -
+#the sorting algorithm. 
+
 import os
 import imdb
 
