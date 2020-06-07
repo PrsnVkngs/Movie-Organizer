@@ -13,6 +13,7 @@ import shutil
 
 #my libraries
 from get_functions import *
+from move_files import *
 
 # title, release date, runtime, director, starrating, mpaarating, cast, plot, genre
 noFields = 7
@@ -37,16 +38,7 @@ defaultStartup = str(defaultStartup)
 number_of_profiles = config[profiles[0]]['numberprofiles']
 profiles = profiles[1:]
 
-#file mamangement functions
 
-def detect_directory(directory, desired):
-    contents = os.listdir(directory)
-    is_present = False
-    for each in contents:
-        if(each == desired):
-            is_present = True
-            break
-    return is_present
 
 #might remove this function, not 100% why it was made or its current use.
 def get_movie_data(data, movie):
@@ -211,29 +203,43 @@ def changeDest(parent, new_label, gui_label):
 #then sorts and moves them to the given destination folder.
 def organize(search_prefs, source, destination):
 
-    #print(source.get())
-    src_list = os.listdir(source.get())
-    src_list_raw = os.listdir(source.get())
+    src_str = source.get()
+    dst_str = destination.get()
+
+    walk_directory ( src_str, dst_str )
+
+    #print(type(src_str))
+    #print(type(source.get()))
+    #src_list = os.listdir(src_str)
+    #src_list_raw = os.listdir(src_str)
+
+    
+    #use os.walk to traverse the file system, use a movies and folder variable and append a list to them at the very beginning of the loop.
+    #use a level_count integer variable to count the levels, then append the folders and movies on each level.
+    #then, add one to the level_count and restart the loop.
+    
     # this will trim the file extension from the files in the source
     # need to make it more intelligent as it doesn't consider whether it is -
     # a file or a folder.
-    for name in range(len(src_list)):
-        src_list[name] = src_list[name][:-4]
-    print(src_list)
-    tmp_i = 0
-    for mov in src_list:
-        print(mov)
-        tmp_genre = get_genre(mov)
-        print(tmp_genre)
+    
+    #for name in range(len(src_list)):
+        #src_list[name] = src_list[name][:-4]
+#    for movie in src_list:
+#        movie = movie[:-4]
+        
+    #print(src_list)
+    #tmp_i = 0
+    #for mov in src_list:
+        #print(mov)
+        #tmp_genre = get_genre(mov)
+        #print(tmp_genre)
         #print(src_list_raw)
-        dir_present = detect_directory(destination.get(), tmp_genre) #variable determines whether the directory for the genre is present or not. true if yes, false if no.
-        print(dir_present)
-        if(dir_present == True):
-            shutil.move(str(source.get()+ '\\' + str(src_list_raw[tmp_i])), str(destination.get() + "\\" + get_genre(mov)))
-        else:
-            os.mkdir(str(destination.get() + "\\" + get_genre(mov)))
-            shutil.move(str(source.get()+ '\\' + str(src_list_raw[tmp_i])), str(destination.get() + "\\" + get_genre(mov)))
-        tmp_i = tmp_i +1
+        #dir_present = detect_directory(dst_str, tmp_genre) #variable determines whether the directory for the genre is present or not. true if yes, false if no.
+        #print(dir_present)
+
+        #tmp_i = tmp_i +1
+
+    
     
     print("Files Organized")  # probably do this one last
 
@@ -281,7 +287,7 @@ def addProfile(parent, source, dest):
         number_of_profiles = str( int(number_of_profiles) + 1 )
         config.set('STARTUP', 'numberprofiles', str(number_of_profiles)) # add one to number of profiles
         
-        #write new values to hard file
+        #open config ini file and write new values to hard file
         with open('user_preferences.ini', 'w') as configfile:
             config.write(configfile)
         configfile.close() #close the configfile

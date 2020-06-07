@@ -1,4 +1,5 @@
 from imdb import IMDb
+import gc
 
 db = IMDb()
 
@@ -9,12 +10,13 @@ def get_movie(movie):
     movie_name = db.search_movie(movie)[0]
     movie = movie_name.movieID
     movie = db.get_movie(movie)
+    gc.collect()
     return movie
 
 def get_genre(movie):  #using the str() function on a movie variable will return just the name
-    tmp = get_movie(movie)
-    genres = tmp.get('genre')
-
+    tmp = get_movie(movie[:-4])
+    genres = tmp.get('genre') #get list of genres from IMDB
+    gc.collect()
     if 'Action' in genres:
         return 'Action Adventure'
     elif 'Adventure' in genres:
