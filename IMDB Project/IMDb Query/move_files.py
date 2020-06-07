@@ -56,7 +56,7 @@ def move_folder( source, destination ):
     shutil.move( source  , destination )
 
 
-def walk_directory(directory, destination):
+def walk_directory(directory, destination, acceptable_rt):
 
     for root, dirs, files in os.walk(directory):
         for folder in dirs:
@@ -64,6 +64,14 @@ def walk_directory(directory, destination):
             print( "Moved the folder " + folder + " to the destination" )
         for movie in files:
             print(movie)
-            move_movie( movie, directory + "\\" + movie, destination )
+            acceptable_rating = float( acceptable_rt )
+            movie_rt = float ( get_star_rating( movie ) )
+
+            if movie_rt >= acceptable_rating:
+                move_movie( movie, directory + "\\" + movie, destination )
+            else:
+                print( movie + " is not above acceptable rating. Did not move." )
+                continue
+            
             print( "Moved the movie " + movie + " to the destination" )
 

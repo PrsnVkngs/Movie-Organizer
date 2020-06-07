@@ -26,6 +26,12 @@ def get_genre(movie):  #using the str() function on a movie variable will return
     else:
         return genres[0]
 
+def get_star_rating ( movie ):
+    temp = get_movie ( movie[:-4] )
+    m_rating = temp['rating']
+
+    return m_rating
+
 def get_all_data(movie):
     movie_data = []
     tmp_movie = get_movie(movie)

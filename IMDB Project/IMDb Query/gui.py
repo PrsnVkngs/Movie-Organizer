@@ -28,6 +28,9 @@ config.read('user_preferences.ini')
 source_directory = ''
 destination_directory = ''
 
+acceptable_rating = float(0)
+
+
 def getProfiles(cfg):
     return cfg.sections()
 
@@ -201,12 +204,15 @@ def changeDest(parent, new_label, gui_label):
 
 #this function organizes movies based on genre using the source files provided by the user
 #then sorts and moves them to the given destination folder.
-def organize(search_prefs, source, destination):
+def organize(search_prefs, source, destination, rt):
 
     src_str = source.get()
     dst_str = destination.get()
+    
+    acc_rating = float( rt.get() )
+    
 
-    walk_directory ( src_str, dst_str )
+    walk_directory ( src_str, dst_str, acc_rating )
 
     #print(type(src_str))
     #print(type(source.get()))
@@ -328,6 +334,8 @@ def makeGUI():
     #plotPref = StringVar()  # 7
     genrePref = StringVar() # 8
 
+    lowest_acceptable_rating = StringVar('')
+
     titlePref.set('true')
     releasePref.set('true')
     runtimePref.set('true')
@@ -375,7 +383,7 @@ def makeGUI():
     ttk.Label(mainframe, textvariable=destinationFolder).grid(column=2, row=3, sticky=W)  # destination Folder
     ttk.Button(mainframe, text="Change", command= lambda: changeDest(root, new_destination_label, destinationFolder)).grid(column=4, row=3, sticky=W)  # change dest
 
-    ttk.Button(mainframe, text="Organize Files", command=lambda:organize(fieldPreferences, sourceFolder, destinationFolder)).grid(column=1, row=4, sticky=W)  # organize button
+    ttk.Button(mainframe, text="Organize Files", command=lambda:organize(fieldPreferences, sourceFolder, destinationFolder, lowest_acceptable_rating )).grid(column=1, row=4, sticky=W)  # organize button
 
     old_labels = [fieldPreferences, sourceFolder, destinationFolder]
     
@@ -402,6 +410,9 @@ def makeGUI():
                                                                             sticky=W)  # kill program button
 
     ttk.Button(mainframe, text = "GC", command = lambda: print(gc.collect())).grid(column = 5, row = 1, sticky = W)
+    
+    ttk.Label(mainframe, text = "Enter the lowest acceptable star rating for a movie:").grid(row = 5, column = 1)
+    ttk.Entry(mainframe, textvariable = lowest_acceptable_rating).grid(column = 2, row = 5)
     
     for child in mainframe.winfo_children(): child.grid_configure(padx=8, pady=8)
 
