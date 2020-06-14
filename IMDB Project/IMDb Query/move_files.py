@@ -25,32 +25,35 @@ def is_4k ( movie ):
                 print(str(movie) + "Movie is not 4k")
                 return False
             
+def move_helper ( movie, path, destination, movie_genre ):
+    
+    print(movie_genre)
+    if is_4k( path ): #if yes, is the movie 4k?
+            if detect_directory ( str ( destination + "\\" + movie_genre ), "4k" ): #if the movie is 4k, is there a 4k directory in the destination?
+                shutil.move( path, (destination + "\\" + movie_genre + "\\4k") )
+            else:
+                os.mkdir ( (destination + "\\" + movie_genre + "\\4k") ) #if no, make one and move it.
+                shutil.move( path, (destination + "\\" + movie_genre + "\\4k") )
+    else:
+        shutil.move( path, (destination + "\\" + movie_genre) )
+
 
 def move_movie ( movie, path, destination ):
     movie_genre = get_genre ( movie )
-    print(movie_genre)
-    if detect_directory ( destination, movie_genre ): #detect if there is a directory for the genre.
-        if is_4k( path ): #if yes, is the movie 4k?
-            if detect_directory ( str ( destination + "\\" + movie_genre ), "4k" ): #if the movie is 4k, is there a 4k directory in the destination?
-                shutil.move( path, (destination + "\\" + movie_genre + "\\4k") )
-            else:
-                os.mkdir ( (destination + "\\" + movie_genre + "\\4k") ) #if no, make one and move it.
-                shutil.move( path, (destination + "\\" + movie_genre + "\\4k") )
-        else:
-            shutil.move( path, (destination + "\\" + movie_genre) )
+    if movie_genre == "None":
+        print( "Could not get a genre from IMDb for the movie " + movie + ", skipping it and moving on to the next." )
+        return #this code is designed to skip the movie if the sorter could not get a genre from imdb.
+
+    try:
+        if detect_directory ( destination, movie_genre ): #detect if there is a directory for the genre.
+            move_helper ( movie, path, destination, movie_genre )
+        else: #if no directory for genre, make one and move the movie.
+            os.mkdir( destination + "\\" + movie_genre )
+            move_helper ( movie, path, destination, movie_genre )
+    except FileExistsError:
+        print("There is a duplicate of " + movie + " in the destination.")
     
-    else: #if no directory for genre, make one and move the movie.
-        movie_genre = get_genre ( movie )
-        os.mkdir( destination + "\\" + movie_genre )
-        if is_4k( path ): #if yes, is the movie 4k?
-            if detect_directory ( str ( destination + "\\" + movie_genre ), "4k" ): #if the movie is 4k, is there a 4k directory in the destination?
-                shutil.move( path, (destination + "\\" + movie_genre + "\\4k") )
-            else:
-                os.mkdir ( (destination + "\\" + movie_genre + "\\4k") ) #if no, make one and move it.
-                shutil.move( path, (destination + "\\" + movie_genre + "\\4k") )
-        else:
-            shutil.move( path, (destination + "\\" + movie_genre) )
-    gc.collect()   
+
 
 def move_folder( source, destination ):
     shutil.move( source  , destination )

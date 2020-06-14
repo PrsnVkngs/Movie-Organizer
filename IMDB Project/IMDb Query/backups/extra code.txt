@@ -1,0 +1,42 @@
+ttk.Checkbutton(prefFrame, text = 'Title', command = lambda: updatePrefs(0, titlePref.get()), variable = titlePref, onvalue = 'true', offvalue = 'false').grid(column = 1, row = 1, sticky = W)
+    releaseBox = ttk.Checkbutton(prefFrame, text = 'Release Date', command = lambda: updatePrefs(1, releasePref.get()), variable = releasePref, onvalue = 'true', offvalue = 'false')
+    runtimeBox = ttk.Checkbutton(prefFrame, text = 'Runtime', command = lambda: updatePrefs(2, runtimePref.get()), variable = runtimePref, onvalue = 'true', offvalue = 'false')
+    directorBox = ttk.Checkbutton(prefFrame, text = 'Directors', command = lambda: updatePrefs(3, directorPref.get()), variable = directorPref, onvalue = 'true', offvalue = 'false')
+    starRatingBox = ttk.Checkbutton(prefFrame, text = 'Star Rating', command = lambda: updatePrefs(4, starRatingPref.get()), variable = starRatingPref, onvalue = 'true', offvalue = 'false')
+    mpaaRatingBox = ttk.Checkbutton(prefFrame, text = 'MPAA Rating', command = lambda: updatePrefs(5, mpaaRatingPref.get()), variable = mpaaRatingPref, onvalue = 'true', offvalue = 'false')
+    castBox = ttk.Checkbutton(prefFrame, text = 'Cast', command = lambda: updatePrefs(6, castPref.get()), variable = castPref, onvalue = 'true', offvalue = 'false')
+    reviewsBox = ttk.Checkbutton(prefFrame, text = 'Reviews', command = lambda: updatePrefs(7, reviewsPref.get()), variable = reviewsPref, onvalue = 'true', offvalue = 'false')
+            
+ttk.Checkbutton(prefFrame, text = 'Title', command = lambda: updatePrefs(0, titlePref.get()), variable = titlePref, onvalue = 'true', offvalue = 'false').grid(column = 1, row = 1, sticky = W)
+ttk.Checkbutton(prefFrame, text = 'Release Date', command = lambda: updatePrefs(1, releasePref.get()), variable = releasePref, onvalue = 'true', offvalue = 'false')
+ttk.Checkbutton(prefFrame, text = 'Runtime', command = lambda: updatePrefs(2, runtimePref.get()), variable = runtimePref, onvalue = 'true', offvalue = 'false')
+ttk.Checkbutton(prefFrame, text = 'Directors', command = lambda: updatePrefs(3, directorPref.get()), variable = directorPref, onvalue = 'true', offvalue = 'false')
+ttk.Checkbutton(prefFrame, text = 'Star Rating', command = lambda: updatePrefs(4, starRatingPref.get()), variable = starRatingPref, onvalue = 'true', offvalue = 'false')
+ttk.Checkbutton(prefFrame, text = 'MPAA Rating', command = lambda: updatePrefs(5, mpaaRatingPref.get()), variable = mpaaRatingPref, onvalue = 'true', offvalue = 'false')
+ttk.Checkbutton(prefFrame, text = 'Cast', command = lambda: updatePrefs(6, castPref.get()), variable = castPref, onvalue = 'true', offvalue = 'false')
+ttk.Checkbutton(prefFrame, text = 'Reviews', command = lambda: updatePrefs(7, reviewsPref.get()), variable = reviewsPref, onvalue = 'true', offvalue = 'false')
+            
+from main
+
+#movie_titles = ['the matrix', 'terminator', 'crocodile dundee', 'frozen ii'] #write names of movies here to be searched
+
+#noMovies = len(movie_titles)
+#movies = []
+#movieTitle = []
+#movieYear = []
+#movieDuration = []
+#movieRating = []
+#movieGenre = []
+#movieDirectors = []
+#movieStarRating = []
+
+#with open ('movieDB.csv') as csv_file :
+#    csv_write = csv.writer(csv_file, delimiter = ',')
+
+#for x in range(noMovies):
+#    temp = movie_titles[x]
+#    search = ia.search_movie(temp)
+#    movies.append(search[0])
+
+#print(movies)
+#print(movieTitle)    

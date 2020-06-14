@@ -305,11 +305,12 @@ def addProfile(parent, source, dest):
     print("Profile Added")
 
 
-def updateLabels(labels, current):
+def updateLabels(labels, current, star_entry):
     print(current)
     for label in range(len(labels)):
         use_label = labels[label]
         use_label.set(config[profiles[current]][config_names[label]+str(current)])
+    star_entry.set ( config[profiles[current]]['lowestrating' + str(current)] )
     print('Labels Updated')
 
 
@@ -361,6 +362,8 @@ def makeGUI():
         fieldPreferences.set(tempString)
         tempString = config[profiles[0]]['srcfolder0']
         sourceFolder.set(tempString)
+        tempString = config[profiles[0]]['lowestrating0']
+        lowest_acceptable_rating.set(tempString)
     else:
         indx = profiles.index(defaultStartup)
         tempString = config[profiles[indx]]['DestFolder' + str(indx)]
@@ -369,6 +372,8 @@ def makeGUI():
         fieldPreferences.set(tempString)
         tempString = config[profiles[indx]]['SrcFolder' + str(indx)]
         sourceFolder.set(tempString)
+        tempString = config[profiles[indx]]['lowestrating' + str(indx)]
+        lowest_acceptable_rating.set(tempString)
 
     ttk.Label(mainframe, text = "Search Preferences:").grid(column = 1, row = 1, sticky = W)
     ttk.Label(mainframe, textvariable=fieldPreferences).grid(column=2, row=1, sticky=W)  # query preferences
@@ -392,11 +397,13 @@ def makeGUI():
     userProfile.grid(column=3, row=4, sticky=W)
     userProfile['values'] = profiles
     userProfile.current(profiles.index(defaultStartup))
-    
+
+    #this Entry box belongs lower in the code but i have to put it here due to pyton bs.
+    #i'm probably not doing it the right way but i'm not experienced enough in python yet. 
 
     def call_update_labels(x):
         current_profile = userProfile.current()
-        updateLabels(old_labels, current_profile)
+        updateLabels(old_labels, current_profile, lowest_acceptable_rating)
     
     userProfile.bind('<<ComboboxSelected>>', call_update_labels)
     
@@ -410,9 +417,9 @@ def makeGUI():
                                                                             sticky=W)  # kill program button
 
     ttk.Button(mainframe, text = "GC", command = lambda: print(gc.collect())).grid(column = 5, row = 1, sticky = W)
-    
+
+    star_entry = ttk.Entry(mainframe, textvariable = lowest_acceptable_rating).grid(column = 2, row = 5)
     ttk.Label(mainframe, text = "Enter the lowest acceptable star rating for a movie:").grid(row = 5, column = 1)
-    ttk.Entry(mainframe, textvariable = lowest_acceptable_rating).grid(column = 2, row = 5)
     
     for child in mainframe.winfo_children(): child.grid_configure(padx=8, pady=8)
 
