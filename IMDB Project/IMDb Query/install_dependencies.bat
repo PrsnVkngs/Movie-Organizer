@@ -5,5 +5,7 @@ echo Now Executing Pip command
 pip install git+https://github.com/alberanid/imdbpy
 pip install tk
 pip install pymediainfo
+::pip install requests
+pip install tmdbsimple
 
-timeout 3
+pause
