@@ -1,4 +1,4 @@
-# remember to remove makeGUI call at the bottom when done
+# remember to remove make_gui call at the bottom when done
 import configparser
 from tkinter import *
 from tkinter import filedialog as files

@@ -1,4 +1,4 @@
-# remember to remove makeGUI call at the bottom when done
+# remember to remove make_gui call at the bottom when done
 import configparser
 from tkinter import *
 from tkinter import filedialog as files
@@ -66,21 +66,21 @@ def changePrefs(parent, selectedProfile, pref_strs):
     prefsWindow.columnconfigure(0, weight=1)
     prefsWindow.rowconfigure(0, weight=1)
 
-    #ttk.Checkbutton(prefFrame, text='Title', command=lambda: updatePrefs(0, titlePref.get()), variable=titlePref,
+    #ttk.Checkbutton(prefFrame, text='Title', command=lambda: update_prefs(0, titlePref.get()), variable=titlePref,
     #                onvalue='true', offvalue='false').grid(column=1, row=1, sticky=W)
-    #ttk.Checkbutton(prefFrame, text='Release Date', command=lambda: updatePrefs(1, releasePref.get()),
+    #ttk.Checkbutton(prefFrame, text='Release Date', command=lambda: update_prefs(1, releasePref.get()),
     #               variable=releasePref, onvalue='true', offvalue='false').grid(column=2, row=1, sticky=W)
-    #ttk.Checkbutton(prefFrame, text='Runtime', command=lambda: updatePrefs(2, runtimePref.get()), variable=runtimePref,
+    #ttk.Checkbutton(prefFrame, text='Runtime', command=lambda: update_prefs(2, runtimePref.get()), variable=runtimePref,
     #                onvalue='true', offvalue='false').grid(column=3, row=1, sticky=W)
-    #ttk.Checkbutton(prefFrame, text='Directors', command=lambda: updatePrefs(3, directorPref.get()),
+    #ttk.Checkbutton(prefFrame, text='Directors', command=lambda: update_prefs(3, directorPref.get()),
     #                variable=directorPref, onvalue='true', offvalue='false').grid(column=4, row=1, sticky=W)
-    #ttk.Checkbutton(prefFrame, text='Star Rating', command=lambda: updatePrefs(4, starRatingPref.get()),
+    #ttk.Checkbutton(prefFrame, text='Star Rating', command=lambda: update_prefs(4, starRatingPref.get()),
     #                variable=starRatingPref, onvalue='true', offvalue='false').grid(column=1, row=2, sticky=W)
-    #ttk.Checkbutton(prefFrame, text='MPAA Rating', command=lambda: updatePrefs(5, mpaaRatingPref.get()),
+    #ttk.Checkbutton(prefFrame, text='MPAA Rating', command=lambda: update_prefs(5, mpaaRatingPref.get()),
     #                variable=mpaaRatingPref, onvalue='true', offvalue='false').grid(column=2, row=2, sticky=W)
-    #ttk.Checkbutton(prefFrame, text='Cast', command=lambda: updatePrefs(6, castPref.get()), variable=castPref,
+    #ttk.Checkbutton(prefFrame, text='Cast', command=lambda: update_prefs(6, castPref.get()), variable=castPref,
     #                onvalue='true', offvalue='false').grid(column=3, row=2, sticky=W)
-    #ttk.Checkbutton(prefFrame, text='Reviews', command=lambda: updatePrefs(7, reviewsPref.get()), variable=reviewsPref,
+    #ttk.Checkbutton(prefFrame, text='Reviews', command=lambda: update_prefs(7, reviewsPref.get()), variable=reviewsPref,
     #                onvalue='true', offvalue='false').grid(column=4, row=2, sticky=W)
 
     for label in pref_strs:

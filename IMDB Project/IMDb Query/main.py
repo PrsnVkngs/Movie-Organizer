@@ -1,8 +1,3 @@
-from imdb import IMDb
-import csv
-from get_functions import *
-from gui import makeGUI
+from gui import make_gui
 
-ia = IMDb()
-
-makeGUI()
+make_gui()
