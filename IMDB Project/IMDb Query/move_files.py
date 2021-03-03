@@ -78,3 +78,12 @@ def walk_directory(directory, destination, acceptable_rt):
             
             print( "Moved the movie " + movie + " to the destination" )
 
+
+
+#from imdb import IMDb, IMDbError
+
+#try:
+#    ia = IMDb()
+#    people = ia.search_person('Mel Gibson')
+#except IMDbError as e:
+#    print(e)

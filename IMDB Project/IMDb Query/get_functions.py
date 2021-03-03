@@ -83,5 +83,5 @@ def get_all_data(movie):
     print('wip')
 
 if __name__ == '__main__':
-    print('why run this modle alone?')
+    print('why run this module alone?')
     print(get_genre('the matrix'))
