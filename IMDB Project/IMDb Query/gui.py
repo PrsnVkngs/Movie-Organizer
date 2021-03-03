@@ -15,6 +15,7 @@ from move_files import *
 no_fields = 7  # do not delete this variable, it is used later in the code.
 prefs = ['true'] * no_fields
 pref_name = ('Title', 'Release date', 'Runtime', 'Director', 'Star Rating', 'MPAA Rating', 'Genre')
+# eventually implement dictionary here
 
 config_names = ('fieldprefs', 'srcfolder', 'destfolder')
 
