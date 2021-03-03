@@ -12,11 +12,11 @@ from tkinter import ttk
 from move_files import *
 
 # title, release date, runtime, director, starrating, mpaarating, cast, plot, genre
-noFields = 7
-prefs = ['true'] * noFields
-prefName = ['Title', 'Release date', 'Runtime', 'Director', 'Star Rating', 'MPAA Rating', 'Genre']
+no_fields = 7  # do not delete this variable, it is used later in the code.
+prefs = ['true'] * no_fields
+pref_name = ('Title', 'Release date', 'Runtime', 'Director', 'Star Rating', 'MPAA Rating', 'Genre')
 
-config_names = ['fieldprefs', 'srcfolder', 'destfolder']
+config_names = ('fieldprefs', 'srcfolder', 'destfolder')
 
 config = configparser.ConfigParser()
 config.read('user_preferences.ini')
@@ -95,23 +95,24 @@ def change_prefs(parent, title_pref, release_pref, runtime_pref, director_pref, 
                     onvalue='true', offvalue='false').grid(column=2, row=3, sticky=W)
 
     ttk.Button(pref_frame, text='Confirm',
-               command=lambda: push_field_INI(field_prefs, selected_profile, prefs_window)).grid(column=1, row=4,
+               command=lambda: push_field_ini(field_prefs, selected_profile, prefs_window)).grid(column=1, row=4,
                                                                                                  sticky=W)
     ttk.Button(pref_frame, text='Close Window', command=lambda: close_window(prefs_window)).grid(column=3, row=4,
                                                                                                  sticky=W)
     # lf = ttk.Labelframe(prefs_window, text = "Select the data you would like to be retrieved")
 
-    for child in pref_frame.winfo_children(): child.grid_configure(padx=8, pady=8)
+    for child in pref_frame.winfo_children():
+        child.grid_configure(padx=8, pady=8)
 
     print("Preferences Changed")
 
 
 # this code will get the selected preferences from the GUI, then push them to the preferences file.
-def push_field_INI(fields, slctd_prof, window):
+def push_field_ini(fields, slctd_prof, window):
     preferences = ''
-    for boo in range(noFields):
+    for boo in range(no_fields):
         if prefs[boo] == 'true':
-            temp = ' ' + prefName[boo] + ','
+            temp = ' ' + pref_name[boo] + ','
             preferences += temp
     preferences = preferences[0:len(preferences) - 1]
 
@@ -120,9 +121,9 @@ def push_field_INI(fields, slctd_prof, window):
     if slctd_prof == 0:
         print('Add a new profile or select a different one to push to ini, as Default is selected.')
     else:
-        currentProf = profiles[slctd_prof]
+        current_prof = profiles[slctd_prof]
         # config[str(currentProf)][str('destFolder'+str(slctdProf))]
-        config[str(currentProf)][str('fieldPrefs' + str(slctd_prof))] = str(preferences)
+        config[str(current_prof)][str('fieldPrefs' + str(slctd_prof))] = str(preferences)
         print(str(preferences))
 
     with open('user_preferences.ini', 'w') as writeconfig:
@@ -136,14 +137,6 @@ def push_field_INI(fields, slctd_prof, window):
 
 def update_prefs(pref_no, value):
     prefs[pref_no] = value
-
-
-def push_src_INI(src):
-    new_src = src
-
-
-def push_dst_INI(dst):
-    new_dst = dst
 
 
 # this method will bring up a new window that allows the user to specify a new
@@ -174,7 +167,8 @@ def change_src(parent, new_label, gui_label):
 
     confirm_button = ttk.Button(src_frame, text="Confirm", command=confirm_dialogue).grid(row=1, column=4, sticky=W)
 
-    for child in src_frame.winfo_children(): child.grid_configure(padx=8, pady=8)
+    for child in src_frame.winfo_children():
+        child.grid_configure(padx=8, pady=8)
 
     print("Source Changed")
 
@@ -207,7 +201,8 @@ def change_dest(parent, new_label, gui_label):
 
     ttk.Button(dst_frame, text="Confirm", command=confirm_dialogue).grid(row=1, column=4, sticky=W)
 
-    for child in dst_frame.winfo_children(): child.grid_configure(padx=8, pady=8)
+    for child in dst_frame.winfo_children():
+        child.grid_configure(padx=8, pady=8)
     print("Destination Changed")
 
 
@@ -226,9 +221,9 @@ def organize(search_prefs, source, destination, rt):
     # src_list = os.listdir(src_str)
     # src_list_raw = os.listdir(src_str)
 
-    # use os.walk to traverse the file system, use a movies and folder variable and append a list to them at the very beginning of the loop.
-    # use a level_count integer variable to count the levels, then append the folders and movies on each level.
-    # then, add one to the level_count and restart the loop.
+    # use os.walk to traverse the file system, use a movies and folder variable and append a list to them at the very
+    # beginning of the loop. use a level_count integer variable to count the levels, then append the folders and
+    # movies on each level. then, add one to the level_count and restart the loop.
 
     # this will trim the file extension from the files in the source
     # need to make it more intelligent as it doesn't consider whether it is -
@@ -239,15 +234,9 @@ def organize(search_prefs, source, destination, rt):
     #    for movie in src_list:
     #        movie = movie[:-4]
 
-    # print(src_list)
-    # tmp_i = 0
-    # for mov in src_list:
-    # print(mov)
-    # tmp_genre = get_genre(mov)
-    # print(tmp_genre)
-    # print(src_list_raw)
-    # dir_present = detect_directory(dst_str, tmp_genre) #variable determines whether the directory for the genre is present or not. true if yes, false if no.
-    # print(dir_present)
+    # print(src_list) tmp_i = 0 for mov in src_list: print(mov) tmp_genre = get_genre(mov) print(tmp_genre) print(
+    # src_list_raw) dir_present = detect_directory(dst_str, tmp_genre) #variable determines whether the directory for
+    # the genre is present or not. true if yes, false if no. print(dir_present)
 
     # tmp_i = tmp_i +1
 
@@ -273,14 +262,18 @@ def add_profile(parent, source, dest):
     prof_var = StringVar('')
     prof_name = ttk.Entry(prof_frame, textvariable=prof_var).grid(column=2, row=2)
 
-    def add_profile():
+    # this function really shouldn't be redefined everytime add_profile is executed but it doesn't run much so for
+    # now its ok.
+    def add_profile_helper():  # this parameter-less function is NOT an overloaded function. It works as a helper
+        # function
+        # for tkinter
         global number_of_profiles  # instantiate reference to global number_of_profiles variable
         source_value = source.get()
         destination_value = dest.get()
         prefs_value = ''
-        for boo in range(noFields):
+        for boo in range(no_fields):
             if prefs[boo] == 'true':
-                temp = ' ' + prefName[boo] + ','
+                temp = ' ' + pref_name[boo] + ','
                 prefs_value += temp
         prefs_value = prefs_value[0:len(prefs_value) - 1]
 
@@ -307,7 +300,7 @@ def add_profile(parent, source, dest):
 
         close_window(new_prof)  # close the popup window
 
-    ttk.Button(prof_frame, text="Confirm", command=add_profile).grid(column=1, row=3)
+    ttk.Button(prof_frame, text="Confirm", command=add_profile_helper).grid(column=1, row=3)
 
     print("Profile Added")
 
@@ -385,21 +378,25 @@ def make_gui():
     ttk.Label(mainframe, text="Search Preferences:").grid(column=1, row=1, sticky=W)
     ttk.Label(mainframe, textvariable=field_preferences).grid(column=2, row=1, sticky=W)  # query preferences
     ttk.Button(mainframe, text="Change",
-               command=lambda: change_prefs(root, title_pref, release_pref, runtime_pref, director_pref, star_rating_pref,
-                                            mpaa_rating_pref, field_preferences, genre_pref, user_profile.current())).grid(
+               command=lambda: change_prefs(root, title_pref, release_pref, runtime_pref, director_pref,
+                                            star_rating_pref,
+                                            mpaa_rating_pref, field_preferences, genre_pref,
+                                            user_profile.current())).grid(
         column=4, row=1, sticky=W)  # change prefs
 
     ttk.Label(mainframe, text="Source Folder:").grid(column=1, row=2, sticky=W)
     ttk.Label(mainframe, textvariable=source_folder).grid(column=2, row=2, sticky=W)  # source folder
-    ttk.Button(mainframe, text="Change", command=lambda: change_src(root, new_source_label, source_folder)).grid(column=4,
-                                                                                                                row=2,
-                                                                                                                sticky=W)
+    ttk.Button(mainframe, text="Change", command=lambda: change_src(root, new_source_label, source_folder)).grid(
+        column=4,
+        row=2,
+        sticky=W)
 
     ttk.Label(mainframe, text="Destination Folder:").grid(column=1, row=3, sticky=W)
     ttk.Label(mainframe, textvariable=destination_folder).grid(column=2, row=3, sticky=W)  # destination Folder
     ttk.Button(mainframe, text="Change",
                command=lambda: change_dest(root, new_destination_label, destination_folder)).grid(column=4, row=3,
-                                                                                                 sticky=W)  # change dest
+                                                                                                  sticky=W)  # change
+    # dest
 
     ttk.Button(mainframe, text="Organize Files",
                command=lambda: organize(field_preferences, source_folder, destination_folder,
@@ -413,8 +410,7 @@ def make_gui():
     user_profile['values'] = profiles
     user_profile.current(profiles.index(defaultStartup))
 
-    # this Entry box belongs lower in the code but i have to put it here due to pyton bs.
-    # i'm probably not doing it the right way but i'm not experienced enough in python yet.
+    # this Entry box belongs lower in the code but i have to put it here due to python stuff.
 
     def call_update_labels(x):
         current_profile = user_profile.current()
@@ -426,9 +422,11 @@ def make_gui():
 
     ttk.Label(mainframe, text="Organization Profile:").grid(column=2, row=4, sticky=E)
 
+    # add user profile button
     ttk.Button(mainframe, text="Add Profile",
                command=lambda: add_profile(root, new_source_label, new_destination_label)).grid(column=4, row=4,
-                                                                                                sticky=W)  # add user profile button
+                                                                                                sticky=W)
+
     ttk.Button(mainframe, text="Exit", command=lambda: kill_prog(root)).grid(column=5, row=4,
                                                                              sticky=W)  # kill program button
 
@@ -437,7 +435,8 @@ def make_gui():
     star_entry = ttk.Entry(mainframe, textvariable=lowest_acceptable_rating).grid(column=2, row=5)
     ttk.Label(mainframe, text="Enter the lowest acceptable star rating for a movie:").grid(row=5, column=1)
 
-    for child in mainframe.winfo_children(): child.grid_configure(padx=8, pady=8)
+    for child in mainframe.winfo_children():
+        child.grid_configure(padx=8, pady=8)
 
     # root.bind('<Return>', organize)  #bind the enter button to organize.
 
