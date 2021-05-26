@@ -8,9 +8,9 @@ import imdb
 db = imdb.IMDb()
 
 movies = db.get_top250_movies()
-movies = movies[225:]
 
-wrk_dir = os.getcwd() + "\\Sample Files\\"
+
+wrk_dir = "O:\\Dummy Movies\\Source\\"
 
 for movie in movies:
     mov_title = str(movie).replace(":", " -").replace("?", "")

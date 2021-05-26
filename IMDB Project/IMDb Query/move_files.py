@@ -61,13 +61,13 @@ def move_folder(source, destination):
 
 
 def walk_directory(directory, destination, acceptable_rt):
+    acceptable_rating = float(acceptable_rt)
     for root, dirs, files in os.walk(directory):
         for folder in dirs:
             move_folder(directory + "\\" + folder, destination)
             print("Moved the folder " + folder + " to the destination")
         for movie in files:
             print(movie)
-            acceptable_rating = float(acceptable_rt)
             movie_rt = float(get_star_rating(movie))
 
             if movie_rt >= acceptable_rating:

@@ -7,6 +7,7 @@ import configparser
 from tkinter import *
 from tkinter import filedialog as files
 from tkinter import ttk
+from multiprocessing import Process
 
 # my libraries
 from move_files import *
@@ -22,10 +23,14 @@ config_names = ('fieldprefs', 'srcfolder', 'destfolder')
 config = configparser.ConfigParser()
 config.read('user_preferences.ini')
 
-source_directory = ''
-destination_directory = ''
+# source_directory = ''
+# destination_directory = ''
 
 acceptable_rating = float(0)
+
+# organizing process variables
+isOrganizing = False
+walk = Process()
 
 
 def get_profiles(cfg):
@@ -55,6 +60,13 @@ def view_movie_data():
 # end file management functions
 
 def kill_prog(program):
+    global isOrganizing
+    global walk
+    if isOrganizing:
+        print("Warning! Program is still organizing. Terminating organization process...")
+        walk.kill()
+        print("Done. Exiting program.")
+
     print("Goodbye")
     program.destroy()
 
@@ -174,7 +186,7 @@ def change_src(parent, new_label, gui_label):
     print("Source Changed")
 
 
-# This funciton will open a new window that will allow the user to
+# This function will open a new window that will allow the user to
 # specify a new destination folder for the program to sort movies.
 def change_dest(parent, new_label, gui_label):
     change_destination_window = Toplevel(parent)
@@ -215,7 +227,14 @@ def organize(search_prefs, source, destination, rt):
 
     acc_rating = float(rt.get())
 
-    walk_directory(src_str, dst_str, acc_rating)
+    global walk
+    walk = Process(target=walk_directory, args=(src_str, dst_str, acc_rating))
+    global isOrganizing
+    isOrganizing = True
+    walk.start()
+    # walk.join()
+
+    # walk_directory(src_str, dst_str, acc_rating)
 
     # print(type(src_str))
     # print(type(source.get()))
@@ -445,4 +464,6 @@ def make_gui():
 
 
 if __name__ == '__main__':
-    make_gui()
+    gui = Process(target=make_gui())
+    gui.start()
+    gui.join()
