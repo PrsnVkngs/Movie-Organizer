@@ -76,7 +76,6 @@ def make_call(movie_file):
     else:
         info_to_return.update({"collection": collection})
 
-
     print(info_to_return)
 
 
@@ -107,7 +106,7 @@ def is_part_of_collection(movie_json):
 
     collection_info = []
 
-    if movie_json["belongs_to_collection"] == 'null':
+    if type(movie_json["belongs_to_collection"]) == type(None):
         return False
     else:
         collection_info.append(movie_json["belongs_to_collection"]["id"])
@@ -117,4 +116,5 @@ def is_part_of_collection(movie_json):
 
 
 if __name__ == '__main__':
-    make_call('Star Wars: Episode II - Attack of the Clones (2002) [tmdbid=38319].mkv')
+    # make_call('Star Wars: Episode II - Attack of the Clones (2002) [tmdbid=38319].mkv')
+    make_call('The Superdeep (2020).mkv')
