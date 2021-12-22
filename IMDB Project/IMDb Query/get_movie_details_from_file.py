@@ -1,6 +1,7 @@
 import re
 
-pattern = re.compile(r'[^\(]*')
+movie_name_pattern = re.compile(r'[^\(]*')
+movie_year_pattern = re.compile(r'[0-9]{4}?')
 
 
 def file_movie_name(file_string):
@@ -16,13 +17,32 @@ def file_movie_name(file_string):
     :param file_string:
     :return:
     """
-    global pattern
+    global movie_name_pattern
 
-    match = re.search(pattern, file_string)
+    match = re.search(movie_name_pattern, file_string)
 
     if match:
         return match.group()
     else:
         return None
+
+
+def file_movie_year(file_string):
+    """
+    This function will return the year of the movie in the file name. Will return None if there is none found.
+    :param file_string:
+    :return:
+    """
+
+    global movie_year_pattern
+
+    match = re.search(movie_year_pattern, file_string)
+
+    if match:
+        return match.group()
+    else:
+        return None
+
+
 
 
