@@ -29,7 +29,7 @@ genre_dictionary = {
 }
 
 
-def make_call(movie_file):
+def make_tmdb_call(movie_file):
     """
     Given a string
     :param movie_file:
@@ -67,7 +67,8 @@ def make_call(movie_file):
         "plot": precise_info["overview"],
         "genres": compile_genres(info_list["genre_ids"]),
         "tagline": precise_info["tagline"],
-        "runtime": precise_info["runtime"]
+        "runtime": precise_info["runtime"],
+        "title": precise_info["title"]
 
     }
 
@@ -76,7 +77,8 @@ def make_call(movie_file):
     else:
         info_to_return.update({"collection": collection})
 
-    print(info_to_return)
+    #print(info_to_return)
+    return info_to_return
 
 
 def compile_genres(genre_list):
@@ -117,4 +119,4 @@ def is_part_of_collection(movie_json):
 
 if __name__ == '__main__':
     # make_call('Star Wars: Episode II - Attack of the Clones (2002) [tmdbid=38319].mkv')
-    make_call('The Superdeep (2020).mkv')
+    make_tmdb_call('The Superdeep (2020).mkv')
