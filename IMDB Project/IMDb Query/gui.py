@@ -11,6 +11,7 @@ from multiprocessing import Process
 
 # my libraries
 from move_files import *
+from update_movie_metadata import start_update
 
 # title, release date, runtime, director, starrating, mpaarating, cast, plot, genre
 no_fields = 7  # do not delete this variable, it is used later in the code.
@@ -31,6 +32,7 @@ acceptable_rating = float(0)
 # organizing process variables
 isOrganizing = False
 walk = Process()
+meta = Process()
 
 
 def get_profiles(cfg):
@@ -263,6 +265,18 @@ def organize(search_prefs, source, destination, rt):
     print("Files Organized")  # probably do this one last
 
 
+def update_meta(source):
+    src_str = source.get()
+
+    # global meta
+    # meta = Process(target=walk_directory_for_meta, args=(src_str))
+    # meta.start()
+
+    walk_directory_for_meta(src_str)
+
+    print("Meta Data updated")
+
+
 # This function will take the values stored in the labels for search preferences,
 # source directory, and destination directory, and write them to the ini file with
 # a user specified name.
@@ -420,7 +434,10 @@ def make_gui():
 
     ttk.Button(mainframe, text="Organize Files",
                command=lambda: organize(field_preferences, source_folder, destination_folder,
-                                        lowest_acceptable_rating)).grid(column=1, row=4, sticky=W)  # organize button
+                                        lowest_acceptable_rating)).grid(column=5, row=5, sticky=W)  # organize button
+
+    ttk.Button(mainframe, text="Update Metadata",
+               command=lambda: update_meta(source_folder)).grid(column=4, row=5, sticky=W)  # update meta button
 
     old_labels = [field_preferences, source_folder, destination_folder]
 

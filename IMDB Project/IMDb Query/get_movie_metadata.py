@@ -49,10 +49,10 @@ def get_track_info(path, movie):
     else:
         movie_metadata.append(text_track)
 
-    print(text_track)
+    # print(audio_track)
 
     return movie_metadata
 
 
 if __name__ == '__main__':
-    get_track_info('O:\\Movies', 'Iron Man 2 (2010).mkv')
+    get_track_info('O:\\Movies', 'Iron Man 2 (2010) 2.mkv')

@@ -3,6 +3,7 @@ import shutil
 from pymediainfo import MediaInfo
 
 from get_functions import *
+from update_movie_metadata import start_update
 
 
 def detect_directory(directory, desired):
@@ -77,6 +78,17 @@ def walk_directory(directory, destination, acceptable_rt):
                 continue
 
             print("Moved the movie " + movie + " to the destination")
+
+
+def walk_directory_for_meta(source):
+    for root, dirs, files in os.walk(source):
+        for folder in dirs:
+            walk_directory_for_meta(source + "\\" + folder)
+
+        for movie in files:
+            print(movie)
+            start_update(source, movie)
+
 
 # from imdb import IMDb, IMDbError
 
