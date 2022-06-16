@@ -59,6 +59,11 @@ def make_tmdb_call(movie_file):
     precise_movie = r.get(tmdb_id_req)
     precise_info = json.loads(precise_movie.text)
 
+
+    #for key in precise_info:
+    #    print(key)
+    #print(precise_info)
+
     collection = is_part_of_collection(precise_info)
 
     info_to_return = {
@@ -77,7 +82,7 @@ def make_tmdb_call(movie_file):
     else:
         info_to_return.update({"collection": collection})
 
-    #print(info_to_return)
+    # print(info_to_return)
     return info_to_return
 
 

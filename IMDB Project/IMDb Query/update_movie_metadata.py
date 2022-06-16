@@ -36,8 +36,8 @@ def start_update(path, movie):
                 track_info[4][i - 1]['codec_id']) + ' --set codec-name=' + \
                         "\"" + str(track_info[4][i - 1]['commercial_name']) + "\"" + ' --set language=' + \
                         str(track_info[4][i - 1]['language']) + \
-                        ' --set channels=' + str(track_info[4][i - 1]['channel_s']) + ' --set sampling-frequency=' + str(
-                track_info[4][i - 1]['sampling_rate'])
+                        ' --set channels=' + str(track_info[4][i - 1]['channel_s']) + ' --set sampling-frequency=' \
+                        + str(track_info[4][i - 1]['sampling_rate'])
 
         # print(prop_cmd)
 

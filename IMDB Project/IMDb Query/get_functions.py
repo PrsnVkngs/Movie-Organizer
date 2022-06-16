@@ -1,7 +1,7 @@
-from imdb import IMDb
+from imdb import Cinemagoer
 import gc
 
-db = IMDb()
+db = Cinemagoer()
 
 
 def get_full_infoset():
