@@ -124,4 +124,4 @@ def is_part_of_collection(movie_json):
 
 if __name__ == '__main__':
     # make_call('Star Wars: Episode II - Attack of the Clones (2002) [tmdbid=38319].mkv')
-    make_tmdb_call('The Superdeep (2020).mkv')
+    print(make_tmdb_call('Parker (2013).mkv'))

@@ -1,0 +1,63 @@
+video info:
+codec id
+codec natural name
+pixel width
+pixel height 
+display width
+display height
+
+audio info:
+codec id
+codec natural name
+language (if available)
+channels
+bit depth
+sampling rate
+
+subtitle info:
+codec id
+codec name
+codec natural name
+language (if available)
+
+
+
+extraneous code
+ # print(prop_cmd)
+
+    # print(track_info)
+
+    # print(track_info[3])
+
+    for i in range(1, track_info[0] + 1):  # add the video track edits
+        prop_cmd += ' --edit track:v' + str(i) + " --set codec-id=" + str(
+            track_info[3][i - 1]['codec_id']) + ' --set codec-name=' + \
+                    "\"" + str(track_info[3][i - 1]['commercial_name']) + "\"" + ' --set pixel-width=' + str(
+            track_info[3][i - 1]['width']) + \
+                    ' --set pixel-height=' + str(track_info[3][i - 1]['height']) + ' --set display-width=' + str(
+            track_info[3][i - 1][
+                'sampled_width']) + ' --set display-height=' + str(track_info[3][i - 1]['sampled_height'])
+
+        # + ' --set bit-depth=' + str(track_info[3][i - 1]['bit_depth'])
+
+    # print(prop_cmd)
+    # print(track_info[4])
+    try:
+        # print(str(track_info[4][i - 1]) + "hello")
+        for i in range(1, track_info[1] + 1):  # add the audio track edits
+            prop_cmd += ' --edit track:a' + str(i) + " --set codec-id=" + str(
+                track_info[4][i - 1]['codec_id']) + ' --set codec-name=' + \
+                        "\"" + str(track_info[4][i - 1]['commercial_name']) + "\"" + ' --set language=' + \
+                        str(track_info[4][i - 1]['language']) + \
+                        ' --set channels=' + str(track_info[4][i - 1]['channel_s']) + ' --set sampling-frequency=' \
+                        + str(track_info[4][i - 1]['sampling_rate'])
+
+        # print(prop_cmd)
+        # print(str(track_info[5][i - 1]) + "hello")
+        for i in range(1, track_info[2] + 1):  # add the subtitle track edits
+            prop_cmd += ' --edit track:s' + str(i) + " --set codec-id=" + str(
+                track_info[5][i - 1]['codec_id']) + ' --set codec-name=' + \
+                        "\"" + str(track_info[5][i - 1]['commercial_name']) + "\"" + ' --set language=' + \
+                        str(track_info[5][i - 1]['language'])
+
+        # print(prop_cmd)

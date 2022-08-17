@@ -1,5 +1,9 @@
 from pymediainfo import MediaInfo as mi
 
+video_info = ['codec_id', 'commercial_name', 'sampled_width', 'sampled_height']
+audio_info = ['codec_id', 'commercial_name', 'language', 'channel_s', 'sampling_rate', 'bit_depth']
+subtitle_info = ['codec_id', 'commercial_name', 'language']
+
 
 def get_track_info(path, movie):
     """
@@ -22,17 +26,18 @@ def get_track_info(path, movie):
     for track in mediainfo_dat.tracks:
         if track.track_type == "Video":
             video_track_count += 1
-            video_track.append(track.to_data())
+            video_track.append({info: track.to_data()[info] for info in video_info if info in track.to_data()})
 
         elif track.track_type == "Audio":
             audio_track_count += 1
-            audio_track.append(track.to_data())
+            audio_track.append({info: track.to_data()[info] for info in audio_info if info in track.to_data()})
 
         elif track.track_type == "Text":
             text_track_count += 1
-            text_track.append(track.to_data())
+            text_track.append({info: track.to_data()[info] for info in subtitle_info if info in track.to_data()})
 
-    movie_metadata = [video_track_count, audio_track_count, text_track_count]
+    # video_track_count, audio_track_count, text_track_count
+    movie_metadata = []
 
     if video_track_count == 0:
         movie_metadata.append("not available")
@@ -55,4 +60,5 @@ def get_track_info(path, movie):
 
 
 if __name__ == '__main__':
-    get_track_info('O:\\Movies', 'Iron Man 2 (2010) 2.mkv')
+    print(
+        get_track_info('Y:\\Movie_Collection\\Action&Adventure\\Parker (2013)\\', 'Parker (2013) [tmdbid=119283].mkv'))
