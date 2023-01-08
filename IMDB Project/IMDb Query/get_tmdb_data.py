@@ -42,13 +42,28 @@ def make_tmdb_call(movie_file):
     name = mov_name(movie_file)
     year = mov_year(movie_file)
 
-    name = name.strip().replace(" ", "%20")
+    name = name.strip().replace(" ", "%20").replace(".mkv", "").replace(",", "%2C")
 
-    tmdb_call_string = 'https://api.themoviedb.org/3/search/movie?api_key=629b1dbf49450758fdd0904c55158104&language' \
-                       '=en-US&query=' + name + '&page=1&include_adult=false&year=' + year
+    if year:
+        tmdb_call_string = f'https://api.themoviedb.org/3/search/movie?api_key=629b1dbf49450758fdd0904c55158104&' \
+                           f'language=en-US&query={name}&page=1&include_adult=false&year={year}'
+    else:
+        tmdb_call_string = f'https://api.themoviedb.org/3/search/movie?api_key=629b1dbf49450758fdd0904c55158104&' \
+                           f'language=en-US&query={name}&page=1&include_adult=false'
+
+    # print("movie info:", name, year)
 
     tmdb_response = r.get(tmdb_call_string)
     movie_info = json.loads(tmdb_response.text)
+
+    if not movie_info["results"]:
+        tmdb_call_string = f'https://api.themoviedb.org/3/search/movie?api_key=629b1dbf49450758fdd0904c55158104&' \
+                           f'language=en-US&query={name}&page=1&include_adult=false'
+        tmdb_response = r.get(tmdb_call_string)
+        movie_info = json.loads(tmdb_response.text)
+
+    if not movie_info["results"]:
+        return None
 
     info_list = movie_info["results"][0]
 
@@ -59,10 +74,9 @@ def make_tmdb_call(movie_file):
     precise_movie = r.get(tmdb_id_req)
     precise_info = json.loads(precise_movie.text)
 
-
-    #for key in precise_info:
+    # for key in precise_info:
     #    print(key)
-    #print(precise_info)
+    # print(precise_info)
 
     collection = is_part_of_collection(precise_info)
 

@@ -1,5 +1,5 @@
 import os
-import subprocess
+import PySimpleGUI as sg
 
 from get_tmdb_data import make_tmdb_call
 from get_movie_metadata import get_track_info
@@ -33,11 +33,17 @@ subtitle_fns = {
 }
 
 
-def start_update(path, movie):
+def start_update(path, movie, main_window):
+    print("getting movie info")
     movie_info = make_tmdb_call(movie)
+    print("getting track info")
     track_info = get_track_info(path, movie)
 
-    prop_cmd = f'{mp_s} \"{path}\\{movie}\" --set \"title={movie_info.get("title")}\" '
+    if movie_info:
+        prop_cmd = f'{mp_s} \"{path}\\{movie}\" --set \"title={movie_info.get("title")}\" '
+    else:
+        prop_cmd = f'{mp_s} \"{path}\\{movie}\" '
+        main_window.write_event_value('-TMDBERR-', movie)
 
     try:
         # video tracks
@@ -64,12 +70,14 @@ def start_update(path, movie):
             for item in subtitle_to_do:
                 prop_cmd += subtitle_fns[item](info[item])
 
-        print(prop_cmd)
+        # print(prop_cmd)
         subprocess.run(prop_cmd)
 
-        # print(prop_cmd)
+        # print("Finish prop cmd\n\nDone!!")
 
-        if movie.find("tmdb") == -1:
+        print("Starting file edit for movie: ", movie)
+
+        if (movie.find("tmdb") == -1) and movie_info:
             src = f"{path}\\{movie}"
             new_name = movie.split('.')
             new_name = new_name[0] + " [tmdbid=" + str(movie_info['id']) + "]" + "." + new_name[1]
@@ -78,17 +86,28 @@ def start_update(path, movie):
             os.rename(src, dst)
 
     except BaseException as err:
-        print(f"Error in {err=}, {type(err)=}")
+        print(f"Error while performing update: {err=}, {type(err)=}")
     # result = subprocess.run(prop_cmd, capture_output=True)
     # print(result.stdout)
 
 
-def folder_update(directory):
+def folder_update(directory, main_window):
+    movie_count = 0
+    for root, dirs, files in os.walk(directory):
+        for movie in files:
+            if '.mkv' in movie:
+                movie_count += 1
+
+    main_window.write_event_value('-MOVCOUNT-', movie_count)
+    movie_prog = 0
 
     for root, dirs, files in os.walk(directory):
-        for name in files:
-            if '.mkv' in name:
-                start_update(root, name)
+        for movie in files:
+            if '.mkv' in movie:
+                movie_prog += 1
+                start_update(root, movie, main_window)
+                #print(root, movie, make_tmdb_call(movie))
+                main_window.write_event_value('-MOVEPROG-', movie_prog)
 
 
 if __name__ == '__main__':
