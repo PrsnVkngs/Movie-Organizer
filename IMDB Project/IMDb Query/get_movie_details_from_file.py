@@ -1,7 +1,8 @@
 import re
 
-movie_name_pattern = re.compile(r'[^\(]*')
-movie_year_pattern = re.compile(r'[0-9]{4}?')
+movie_year_pattern = re.compile(r'(?<=\()[0-9]{4}')
+tmdbid_pattern = re.compile(r"\[.+?\]")
+year_pattern = re.compile(r"\(.+?\)")
 
 
 def file_movie_name(file_string):
@@ -17,14 +18,30 @@ def file_movie_name(file_string):
     :param file_string:
     :return:
     """
-    global movie_name_pattern
 
-    match = re.search(movie_name_pattern, file_string)
+    global year_pattern, tmdbid_pattern
+
+    working_string = file_string[:-4]
+    working_string = re.sub(tmdbid_pattern, "", working_string)
+    working_string = re.sub(year_pattern, "", working_string)
+
+    return working_string
+
+
+"""
+    if match:
+        return match.group()
+
+    global fallback_movie_patt
+
+    match = re.search(fallback_movie_patt, file_string)
+    print("Second match: ", match)
 
     if match:
         return match.group()
-    else:
-        return None
+
+    return str(file_string)[-4:]
+"""
 
 
 def file_movie_year(file_string):
@@ -38,11 +55,9 @@ def file_movie_year(file_string):
 
     match = re.search(movie_year_pattern, file_string)
 
+    print("Movie year found was: ", match)  # TODO remove this before release.
+
     if match:
         return match.group()
     else:
         return None
-
-
-
-

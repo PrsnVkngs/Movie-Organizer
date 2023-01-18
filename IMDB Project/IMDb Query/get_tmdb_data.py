@@ -1,5 +1,6 @@
 import requests as r
 import json
+import re
 
 from get_movie_details_from_file import file_movie_name as mov_name
 from get_movie_details_from_file import file_movie_year as mov_year
@@ -28,46 +29,62 @@ genre_dictionary = {
 
 }
 
+tmdbid_pattern = re.compile(r'(?<=\=)[0-9]*')
 
-def make_tmdb_call(movie_file):
+
+def make_tmdb_call(movie_name):
     """
     Given a string
-    :param movie_file:
+    :param movie_name:
 
     The program will return
     :return:
 
     A dict type containing the valuable movie information.
     """
-    name = mov_name(movie_file)
-    year = mov_year(movie_file)
 
-    name = name.strip().replace(" ", "%20").replace(".mkv", "").replace(",", "%2C")
+    find_id = re.search(tmdbid_pattern, movie_name)
 
-    if year:
-        tmdb_call_string = f'https://api.themoviedb.org/3/search/movie?api_key=629b1dbf49450758fdd0904c55158104&' \
-                           f'language=en-US&query={name}&page=1&include_adult=false&year={year}'
+    if find_id:
+        mov_id = find_id.group(0)
     else:
-        tmdb_call_string = f'https://api.themoviedb.org/3/search/movie?api_key=629b1dbf49450758fdd0904c55158104&' \
-                           f'language=en-US&query={name}&page=1&include_adult=false'
+        # print("The received movie name was: ", movie_name)
 
-    # print("movie info:", name, year)
+        name = mov_name(movie_name)
 
-    tmdb_response = r.get(tmdb_call_string)
-    movie_info = json.loads(tmdb_response.text)
+        # print("The name gotten back was: ", name)
 
-    if not movie_info["results"]:
-        tmdb_call_string = f'https://api.themoviedb.org/3/search/movie?api_key=629b1dbf49450758fdd0904c55158104&' \
-                           f'language=en-US&query={name}&page=1&include_adult=false'
+        year = mov_year(movie_name)
+
+        if name is None:
+            return None
+
+        name = name.strip().replace(" ", "%20").replace(".mkv", "").replace(",", "%2C")
+
+        if year:
+            tmdb_call_string = f'https://api.themoviedb.org/3/search/movie?api_key=629b1dbf49450758fdd0904c55158104&' \
+                               f'language=en-US&query={name}&page=1&include_adult=false&year={year}'
+        else:
+            tmdb_call_string = f'https://api.themoviedb.org/3/search/movie?api_key=629b1dbf49450758fdd0904c55158104&' \
+                               f'language=en-US&query={name}&page=1&include_adult=false'
+
+        # print("movie info:", name, year)
+
         tmdb_response = r.get(tmdb_call_string)
         movie_info = json.loads(tmdb_response.text)
 
-    if not movie_info["results"]:
-        return None
+        if not movie_info["results"]:
+            tmdb_call_string = f'https://api.themoviedb.org/3/search/movie?api_key=629b1dbf49450758fdd0904c55158104&' \
+                               f'language=en-US&query={name}&page=1&include_adult=false'
+            tmdb_response = r.get(tmdb_call_string)
+            movie_info = json.loads(tmdb_response.text)
 
-    info_list = movie_info["results"][0]
+        if not movie_info["results"]:
+            return None
 
-    mov_id = info_list["id"]
+        info_list = movie_info["results"][0]
+
+        mov_id = info_list["id"]
 
     tmdb_id_req = 'https://api.themoviedb.org/3/movie/' + str(mov_id) + '?api_key=629b1dbf49450758fdd0904c55158104' \
                                                                         '&language=en-US'
@@ -84,7 +101,8 @@ def make_tmdb_call(movie_file):
 
         "id": mov_id,
         "plot": precise_info["overview"],
-        "genres": compile_genres(info_list["genre_ids"]),
+        "genres": compile_genres(precise_info["genres"]),  # TODO potential change here, consider changing back to
+        # info_list[genre_ids] if experiencing unexpected behavior.
         "tagline": precise_info["tagline"],
         "runtime": precise_info["runtime"],
         "title": precise_info["title"]
@@ -107,12 +125,15 @@ def compile_genres(genre_list):
     :return:
     """
 
-    global genre_dictionary
+    # global genre_dictionary
 
     genres = []
 
-    for ids in genre_list:
-        genres.append(genre_dictionary[ids])
+    for genre_dict in genre_list:
+        genres.append(genre_dict["name"])
+
+    # for ids in genre_list:
+    #     genres.append(genre_dictionary[ids])
 
     return genres
 
@@ -134,8 +155,3 @@ def is_part_of_collection(movie_json):
         collection_info.append(movie_json["belongs_to_collection"]["name"])
 
         return collection_info
-
-
-if __name__ == '__main__':
-    # make_call('Star Wars: Episode II - Attack of the Clones (2002) [tmdbid=38319].mkv')
-    print(make_tmdb_call('Parker (2013).mkv'))

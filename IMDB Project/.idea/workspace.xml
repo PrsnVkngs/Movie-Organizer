@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="ANALYZE_INJECTED_CODE" value="false" />
+    <option name="SCOPE_TYPE" value="3" />
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f38c7680-7ddd-4bfa-ac30-546a88797f4c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/IMDB Project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/IMDB Project.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="f38c7680-7ddd-4bfa-ac30-546a88797f4c" name="Changes" comment="Basic fixes pre-pathlib">
+      <change afterPath="$PROJECT_DIR$/IMDb Query/assets/movie_file_editor_icon.ico" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IMDb Query/assets/movie_file_editor_icon.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/IMDb Query/program_icon.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/IMDb Query/file_fixer.py" beforeDir="false" afterPath="$PROJECT_DIR$/IMDb Query/file_fixer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IMDb Query/get_movie_details_from_file.py" beforeDir="false" afterPath="$PROJECT_DIR$/IMDb Query/get_movie_details_from_file.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/IMDb Query/get_movie_metadata.py" beforeDir="false" afterPath="$PROJECT_DIR$/IMDb Query/get_movie_metadata.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/IMDb Query/get_tmdb_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/IMDb Query/get_tmdb_data.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/IMDb Query/update_movie_metadata.py" beforeDir="false" afterPath="$PROJECT_DIR$/IMDb Query/update_movie_metadata.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/generate_dummy_movies.py" beforeDir="false" afterPath="$PROJECT_DIR$/generate_dummy_movies.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,6 +43,7 @@
     <setting file="file://$PROJECT_DIR$/IMDb Query/gui.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/IMDb Query/mkv_prop_edit.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/IMDb Query/move_files.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/IMDb Query/program_icon.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/IMDb Query/update_movie_metadata.py" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -58,7 +65,8 @@
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;aDefault&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -213,7 +221,26 @@
       <workItem from="1672606819851" duration="636000" />
       <workItem from="1672614511066" duration="25000" />
       <workItem from="1673137058621" duration="1234000" />
+      <workItem from="1673216918053" duration="5162000" />
+      <workItem from="1673249346949" duration="600000" />
+      <workItem from="1673296310149" duration="232000" />
+      <workItem from="1673301589482" duration="597000" />
+      <workItem from="1673325013085" duration="597000" />
+      <workItem from="1673572912867" duration="14169000" />
+      <workItem from="1673639546830" duration="7287000" />
+      <workItem from="1673654027780" duration="7565000" />
+      <workItem from="1673812419924" duration="1584000" />
+      <workItem from="1673903055859" duration="2518000" />
+      <workItem from="1673994215954" duration="1781000" />
     </task>
+    <task id="LOCAL-00001" summary="Basic fixes pre-pathlib">
+      <created>1673217176628</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1673217176628</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -230,8 +257,12 @@
       </map>
     </option>
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Basic fixes pre-pathlib" />
+    <option name="LAST_COMMIT_MESSAGE" value="Basic fixes pre-pathlib" />
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/IMDB_Project$file_fixer.coverage" NAME="file_fixer Coverage Results" MODIFIED="1673137093548" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IMDb Query" />
+    <SUITE FILE_PATH="coverage/IMDB_Project$file_fixer.coverage" NAME="file_fixer Coverage Results" MODIFIED="1673929925381" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IMDb Query" />
     <SUITE FILE_PATH="coverage/IMDB_Project$get_tmdb_data.coverage" NAME="get_tmdb_data Coverage Results" MODIFIED="1659903119164" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IMDb Query" />
     <SUITE FILE_PATH="coverage/IMDB_Project$get_movie_metadata.coverage" NAME="get_movie_metadata Coverage Results" MODIFIED="1660612559895" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IMDb Query" />
     <SUITE FILE_PATH="coverage/IMDB_Project$generate_dummy_movies.coverage" NAME="generate_dummy_movies Coverage Results" MODIFIED="1672549671799" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

@@ -1,19 +1,20 @@
-from pymediainfo import MediaInfo as mi
+from pymediainfo import MediaInfo as mI
+from pathlib import Path
 
 video_info = ['codec_id', 'commercial_name', 'sampled_width', 'sampled_height']
 audio_info = ['codec_id', 'commercial_name', 'language', 'channel_s', 'sampling_rate', 'bit_depth']
 subtitle_info = ['codec_id', 'commercial_name', 'language']
 
 
-def get_track_info(path, movie):
+def get_track_info(path_to):
     """
     Given the directory location of a movie, this function will parse the file into MediaInfo and return the
     available video, audio and text track details. :param path: :param movie: :return: A list of data in dict form
-    for the movie file. Elements 1-3 are counters to make it more easily known how many of each tracks there are.
+    for the movie file. Elements 1-3 are counters to make it more easily known how many of each track there are.
     Video track is element 4, Audio track is element 5, Text track is element 6. There will be a string saying "not
     available" if media info does not find a track for that type.
     """
-    mediainfo_dat = mi.parse(path + "\\" + movie)
+    mediainfo_dat = mI.parse(path_to.absolute())
 
     video_track = []
     audio_track = []
@@ -60,5 +61,4 @@ def get_track_info(path, movie):
 
 
 if __name__ == '__main__':
-    print(
-        get_track_info('Y:\\Movie_Collection\\Action&Adventure\\Parker (2013)\\', 'Parker (2013) [tmdbid=119283].mkv'))
+    print(get_track_info(Path('O:/Movie/Indiana Jones and the Kingdom of the Crystal Skull (2008) [tmdbid=217].mkv')))
