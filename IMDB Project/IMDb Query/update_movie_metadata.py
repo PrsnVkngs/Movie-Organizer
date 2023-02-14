@@ -1,9 +1,12 @@
 import gc
+from _winapi import CREATE_NO_WINDOW
 from pathlib import Path
+import PySimpleGUI
 
 from get_movie_metadata import get_track_info
 from get_tmdb_data import make_tmdb_call
 from mkv_prop_edit import *
+from get_movie_details_from_file import has_tmdb_tag
 
 mp_s = 'mkvpropedit'
 video_fns = {
@@ -33,10 +36,17 @@ subtitle_fns = {
 }
 
 
-def start_update(movie, main_window):
+def start_update(movie, main_window, settings):
 
     print("Currently editing the movie: ", movie.name, " in directory: ", movie.parent)
 
+    if has_tmdb_tag(movie.name) and not settings[1]:
+        if settings[0]:
+            main_window.write_event_value(key='-GENERAL_ERROR-',
+                                          value=[f"The movie: {movie.name} has a TMDB tag and does not need updating.",
+                                                 "black on green"])
+        print('\n')
+        return None
 
 
     # print("getting movie info")
@@ -48,7 +58,8 @@ def start_update(movie, main_window):
         prop_cmd = f'{mp_s} \"{movie.absolute()}\" --set \"title={movie_info.get("title")}\" '
     else:
         prop_cmd = f'{mp_s} \"{movie.absolute()}\" '
-        main_window.write_event_value('-TMDBERR-', "Could not retrieve the name for: " + str(movie.name))
+        if settings[0]:
+            main_window.write_event_value('-TMDBERR-', "Could not retrieve the name for: " + str(movie.name))
 
     try:
         # video tracks
@@ -76,7 +87,7 @@ def start_update(movie, main_window):
                 prop_cmd += subtitle_fns[item](info[item])
 
         # print(prop_cmd)
-        result = subprocess.run(prop_cmd, capture_output=True)
+        result = subprocess.run(prop_cmd, capture_output=True, creationflags=CREATE_NO_WINDOW)
 
         match result.returncode:
             case 0:
@@ -99,6 +110,8 @@ def start_update(movie, main_window):
 
             src.rename(dst)
 
+        print('\n')
+
     except BaseException as err:
         print(f"Error while performing update: {err=}, {type(err)=}")
         main_window.write_event_value(key='-GENERAL_ERROR-', value=["Check if MKVToolNix and MediaInfo Installation "
@@ -108,7 +121,7 @@ def start_update(movie, main_window):
     # print(result.stdout)
 
 
-def folder_update(raw_dir, main_window):
+def folder_update(raw_dir, main_window, settings):
 
     directory = Path(raw_dir)
 
@@ -124,7 +137,11 @@ def folder_update(raw_dir, main_window):
     main_window.write_event_value('-MOVCOUNT-', movie_count)
     movie_prog = 0
 
+    print("about to go through files")
+
     for movies in path_list:
+        if main_window['-CANCEL-']:
+            break
         start_update(movies, main_window)
         movie_prog += 1
         main_window.write_event_value('-MOVEPROG-', movie_prog)

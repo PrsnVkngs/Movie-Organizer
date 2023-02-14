@@ -1,14 +1,23 @@
 from pathlib import Path
 import PySimpleGUI as sG
+import configparser
 
 from update_movie_metadata import start_update, folder_update
 from program_icon import get_icon_base64
 
 
 def run():
-    # program_icon_path = Path('O:/GitHub/Movie-Organizer/IMDB Project/IMDb Query/assets')
-    #
-    # program_icon = program_icon_path / 'movie_file_editor_icon.ico'
+    settings_file = Path().home()
+    settings_file = settings_file / 'Documents/FileFixer/Settings'
+    if not settings_file.exists():
+        settings_file.mkdir(parents=True, exist_ok=True)
+
+    settings_file = settings_file / 'settings.ini'
+    if not settings_file.exists():
+        create_settings_file(settings_file)
+
+    config = read_settings_file(settings_file)
+    profile = config.get('DEFAULT', 'profile')
 
     sG.theme('DarkBlue')
 
@@ -20,14 +29,22 @@ def run():
     BAR_INC = 0
 
     settings_tab = [
+
         [sG.Text("These logging settings determine the level of detail that is written to the log file.")],
         [sG.Text("Logging Info: 1 = Minimal, 2 = L1+Warnings, 3 = 2+Errors")],
-        [sG.Text("Logging level:"), sG.Slider((1, 3), orientation='h', key='-LOGGING_LEVEL-'),
-         sG.Checkbox("Output Verbose Mode", key='-VERBOSE-')],
-        [sG.Text("Log File Location:"), sG.Input(k='-LOG_LOCATION-', visible=True, expand_x=True, expand_y=False),
+        [sG.Text("Logging level:"), sG.Slider((1, 3), orientation='h', key='-LOGGING_LEVEL-',
+                                              default_value=int(config.get(profile, 'logging level'))),
+         sG.Checkbox("Output Verbose Mode", key='-VERBOSE-', default=bool(config.get(profile, 'output verbose')))],
+
+        [sG.Text("Force Updates regardless of TMDb Tag:"), sG.Checkbox('Force updates', key='-UPDATE_FORCE-',
+                                                                       default=bool(config.get(profile, 'force updates')))],
+
+        [sG.Text("Log File Location:"), sG.Input(k='-LOG_LOCATION-', visible=True, expand_x=True, expand_y=False,
+                                                 default_text=config.get(profile, 'log location')),
          sG.FolderBrowse("Choose Folder", target='-LOG_LOCATION-')],
 
-        [sG.Text("Number of threads:"), sG.Slider((1, 4), 1, orientation='h', key='-THREAD_COUNT-')]
+        [sG.Text("Number of threads:"), sG.Slider((1, 4), orientation='h', key='-THREAD_COUNT-',
+                                                  default_value=int(config.get(profile, 'thread count')))]
     ]
 
     main_tab = [
@@ -37,7 +54,7 @@ def run():
         [sG.Input(key='-FILE-', visible=True, expand_x=True, expand_y=False,
                   tooltip="Paste a folder as a directory here:", size=54),
          sG.FileBrowse("Choose File", target='-FILE-'), sG.FolderBrowse("Choose Folder", target='-FILE-'),
-         sG.Sizer(h_pixels=0, v_pixels=50),
+         sG.Sizer(h_pixels=0, v_pixels=50)
          # sg.Sizer(h_pixels=30, v_pixels=75)
          ],
 
@@ -48,7 +65,8 @@ def run():
         [sG.Text("Folder sorting not started.", key='-PDESC-')],
         [sG.ProgressBar(max_value=BAR_MAX, expand_x=True, expand_y=True, s=(43, 20), p=(5, 10), key='-PROG-')],
 
-        [sG.Button("Run", key='-RUN-'), sG.Button("Clear Log", key='-CLR-'), sG.Exit(), sG.Sizer(h_pixels=0, v_pixels=40)]
+        [sG.Button("Run", key='-RUN-'), sG.Button("Cancel", key='-CANCEL-'), sG.Button("Clear Log", key='-CLR-'), sG.Exit(),
+         sG.Sizer(h_pixels=0, v_pixels=40)]
 
     ]
 
@@ -59,7 +77,7 @@ def run():
                 [
                     [sG.Tab("Main Tab", main_tab),
                      sG.Tab("Settings", settings_tab)]
-                ], pad=(0, 10)
+                ], pad=(3, 10)
             ),
             sG.Sizegrip(k='-RESIZE-')
         ]
@@ -87,17 +105,24 @@ def run():
 
                 mkv = full_path.match("*.mkv")
 
+                running = True
+                window.write_event_value('-CANCEL-', False)
+                settings = [values.get('-VERBOSE-'), values.get('-UPDATE_FORCE-'), values.get('-THREAD_COUNT-'),
+                            values.get('-LOG_LOCATION-'), values.get('-LOGGING_LEVEL-')]
+
                 if mkv:
                     # print("start single update", full_path, "|", full_path.parts)
-                    running = True
-                    window.perform_long_operation(lambda: start_update(full_path, window), '-SUPDT-')
+                    window.perform_long_operation(lambda: start_update(full_path, window, settings), '-SUPDT-')
                 else:
                     # print("start folder update", full_path, "|", full_path.parts)
-                    running = True
-                    window.perform_long_operation(lambda: folder_update(full_path, window), '-FUPDT-')
+                    window.perform_long_operation(lambda: folder_update(full_path, window, settings), '-FUPDT-')
+
+            case '-CANCEL-':
+                window.write_event_value('-CANCEL-', True)
 
             case '-SUPDT-' | '-FUPDT-':
                 running = False
+                print("File fixer has completed running!")
 
             case '-MOVCOUNT-':
                 no_movies = values.get('-MOVCOUNT-')
@@ -117,6 +142,21 @@ def run():
                     f"There was an issue getting TMDB Data for the movie {values.get('-TMDBERR-')}. Metadata will "
                     f"still be fixed, however, title tag will not.", c='white on red')
 
+            case '-LOGGING_LEVEL-':
+                print("Value of LOGGING_LEVEL ", values.get('-LOGGING_LEVEL-'))
+
+            case '-VERBOSE-':
+                print("Verbose setting: ", values.get('-VERBOSE-'))
+
+            case '-UPDATE_FORCE-':
+                print("Update force state: ", values.get('-UPDATE_FORCE-'))
+
+            case '-LOG_LOCATION-':
+                print("Location of the log: ", values.get('-LOG_LOCATION-'))
+
+            case '-THREAD_COUNT-':
+                print("Number of threads to use: ", values.get('-THREAD_COUNT-'))
+
             case '-GENERAL_ERROR-':
                 error_message_details = values.get('-GENERAL_ERROR-')
                 sG.cprint(error_message_details[0], c=error_message_details[1])
@@ -125,6 +165,36 @@ def run():
                 window['-ACT-'].update('')
 
     window.close()
+
+
+def read_settings_file(file_path):
+    config = configparser.ConfigParser()
+
+    config.read(file_path)
+    return config
+
+
+def write_settings_file(file_path):
+    return None
+
+
+def create_settings_file(file_path):
+    config = configparser.ConfigParser()
+
+    default_log = Path().home()
+    default_log = default_log / 'Documents/FileFixer/Logs'
+
+    config['DEFAULT'] = {
+        'Logging Level': 1,
+        'Output Verbose': False,
+        'Force Updates': False,
+        'Log Location': default_log,
+        'Thread Count': 1
+    }
+
+    with file_path.open(mode='w') as cfg:
+        config.write(cfg)
+        cfg.close()
 
 
 if __name__ == "__main__":

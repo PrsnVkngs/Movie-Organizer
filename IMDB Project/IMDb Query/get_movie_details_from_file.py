@@ -19,10 +19,10 @@ def file_movie_name(file_string):
     :return:
     """
 
-    global year_pattern, tmdbid_pattern
+    global year_pattern  # , tmdbid_pattern
 
     working_string = file_string[:-4]
-    working_string = re.sub(tmdbid_pattern, "", working_string)
+    # working_string = re.sub(tmdbid_pattern, "", working_string)
     working_string = re.sub(year_pattern, "", working_string)
 
     return working_string
@@ -55,9 +55,20 @@ def file_movie_year(file_string):
 
     match = re.search(movie_year_pattern, file_string)
 
-    print("Movie year found was: ", match)  # TODO remove this before release.
+    # print("Movie year found was: ", match)  # TODO remove this before release.
 
     if match:
         return match.group()
     else:
         return None
+
+
+def has_tmdb_tag(file_string):
+    global tmdbid_pattern
+
+    match = re.search(tmdbid_pattern, file_string)
+
+    if match:
+        return True
+    else:
+        return False
