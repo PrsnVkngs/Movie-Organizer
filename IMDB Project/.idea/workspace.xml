@@ -8,11 +8,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f38c7680-7ddd-4bfa-ac30-546a88797f4c" name="Changes" comment="Added Settings tab">
+    <list default="true" id="f38c7680-7ddd-4bfa-ac30-546a88797f4c" name="Changes" comment="Fixed Console popping up during folder update. Added functionality to some of the settings tab features such as verbose mode and force updates.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/IMDb Query/file_fixer.py" beforeDir="false" afterPath="$PROJECT_DIR$/IMDb Query/file_fixer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IMDb Query/get_movie_details_from_file.py" beforeDir="false" afterPath="$PROJECT_DIR$/IMDb Query/get_movie_details_from_file.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IMDb Query/update_movie_metadata.py" beforeDir="false" afterPath="$PROJECT_DIR$/IMDb Query/update_movie_metadata.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -235,7 +233,8 @@
       <workItem from="1676280328472" duration="110000" />
       <workItem from="1676280539924" duration="811000" />
       <workItem from="1676339865832" duration="777000" />
-      <workItem from="1676350060085" duration="3767000" />
+      <workItem from="1676350060085" duration="4466000" />
+      <workItem from="1676505119908" duration="1539000" />
     </task>
     <task id="LOCAL-00001" summary="Basic fixes pre-pathlib">
       <created>1673217176628</created>
@@ -251,7 +250,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674004043714</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Fixed Console popping up during folder update. Added functionality to some of the settings tab features such as verbose mode and force updates.">
+      <created>1676364404917</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1676364404917</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -271,10 +277,11 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Basic fixes pre-pathlib" />
     <MESSAGE value="Added Settings tab" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added Settings tab" />
+    <MESSAGE value="Fixed Console popping up during folder update. Added functionality to some of the settings tab features such as verbose mode and force updates." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed Console popping up during folder update. Added functionality to some of the settings tab features such as verbose mode and force updates." />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/IMDB_Project$file_fixer.coverage" NAME="file_fixer Coverage Results" MODIFIED="1676362325582" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IMDb Query" />
+    <SUITE FILE_PATH="coverage/IMDB_Project$file_fixer.coverage" NAME="file_fixer Coverage Results" MODIFIED="1676509212744" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IMDb Query" />
     <SUITE FILE_PATH="coverage/IMDB_Project$get_tmdb_data.coverage" NAME="get_tmdb_data Coverage Results" MODIFIED="1659903119164" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IMDb Query" />
     <SUITE FILE_PATH="coverage/IMDB_Project$get_movie_metadata.coverage" NAME="get_movie_metadata Coverage Results" MODIFIED="1660612559895" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/IMDb Query" />
     <SUITE FILE_PATH="coverage/IMDB_Project$generate_dummy_movies.coverage" NAME="generate_dummy_movies Coverage Results" MODIFIED="1672549671799" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

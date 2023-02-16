@@ -8,7 +8,10 @@ from program_icon import get_icon_base64
 
 def run():
     settings_file = Path().home()
-    settings_file = settings_file / 'Documents/FileFixer/Settings'
+    settings_file = settings_file / 'Documents/FileFixer'
+    if not settings_file.exists():
+        settings_file.mkdir(parents=True, exist_ok=True)
+    settings_file = settings_file / 'Settings'
     if not settings_file.exists():
         settings_file.mkdir(parents=True, exist_ok=True)
 
@@ -17,7 +20,14 @@ def run():
         create_settings_file(settings_file)
 
     config = read_settings_file(settings_file)
-    profile = config.get('DEFAULT', 'profile')
+
+    try:
+        profile = config.get('DEFAULT', 'profile')
+
+    except configparser.NoOptionError:
+        create_settings_file(settings_file)
+        config = read_settings_file(settings_file)
+        profile = config.get('DEFAULT', 'profile')
 
     sG.theme('DarkBlue')
 
@@ -37,7 +47,8 @@ def run():
          sG.Checkbox("Output Verbose Mode", key='-VERBOSE-', default=bool(config.get(profile, 'output verbose')))],
 
         [sG.Text("Force Updates regardless of TMDb Tag:"), sG.Checkbox('Force updates', key='-UPDATE_FORCE-',
-                                                                       default=bool(config.get(profile, 'force updates')))],
+                                                                       default=bool(
+                                                                           config.get(profile, 'force updates')))],
 
         [sG.Text("Log File Location:"), sG.Input(k='-LOG_LOCATION-', visible=True, expand_x=True, expand_y=False,
                                                  default_text=config.get(profile, 'log location')),
@@ -65,7 +76,8 @@ def run():
         [sG.Text("Folder sorting not started.", key='-PDESC-')],
         [sG.ProgressBar(max_value=BAR_MAX, expand_x=True, expand_y=True, s=(43, 20), p=(5, 10), key='-PROG-')],
 
-        [sG.Button("Run", key='-RUN-'), sG.Button("Cancel", key='-CANCEL-'), sG.Button("Clear Log", key='-CLR-'), sG.Exit(),
+        [sG.Button("Run", key='-RUN-'), sG.Button("Cancel", key='-CANCEL-'), sG.Button("Clear Log", key='-CLR-'),
+         sG.Exit(),
          sG.Sizer(h_pixels=0, v_pixels=40)]
 
     ]
@@ -186,10 +198,11 @@ def create_settings_file(file_path):
 
     config['DEFAULT'] = {
         'Logging Level': 1,
+        'Thread Count': 1,
         'Output Verbose': False,
         'Force Updates': False,
         'Log Location': default_log,
-        'Thread Count': 1
+        'Profile': 'DEFAULT'
     }
 
     with file_path.open(mode='w') as cfg:
