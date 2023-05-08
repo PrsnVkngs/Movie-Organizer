@@ -1,12 +1,11 @@
-import gc
 from _winapi import CREATE_NO_WINDOW
 from pathlib import Path
-import PySimpleGUI
+import logging
 
+from get_movie_details_from_file import has_tmdb_tag
 from get_movie_metadata import get_track_info
 from get_tmdb_data import make_tmdb_call
 from mkv_prop_edit import *
-from get_movie_details_from_file import has_tmdb_tag
 
 mp_s = 'mkvpropedit'
 video_fns = {
@@ -40,8 +39,8 @@ def start_update(movie, main_window, settings):
 
     print("Currently editing the movie: ", movie.name, " in directory: ", movie.parent)
 
-    if has_tmdb_tag(movie.name) and not settings[1]:
-        if settings[0]:
+    if has_tmdb_tag(movie.name) and not settings['update-force']:  # update force setting
+        if settings['verbose']:
             main_window.write_event_value(key='-GENERAL_ERROR-',
                                           value=[f"The movie: {movie.name} has a TMDB tag and does not need updating.",
                                                  "black on green"])
@@ -113,10 +112,13 @@ def start_update(movie, main_window, settings):
         print('\n')
 
     except BaseException as err:
-        print(f"Error while performing update: {err=}, {type(err)=}")
-        main_window.write_event_value(key='-GENERAL_ERROR-', value=["Check if MKVToolNix and MediaInfo Installation "
+        if settings['verbose']:
+            print(f"Error while performing update: {err=}, {type(err)=}")
+            main_window.write_event_value(key='-GENERAL_ERROR-', value=["Check if MKVToolNix and MediaInfo Installation"
                                                                     "Locations are on the system environment "
                                                                     "variable.", "black on yellow"])
+
+
     # result = subprocess.run(prop_cmd, capture_output=True)
     # print(result.stdout)
 
@@ -142,6 +144,6 @@ def folder_update(raw_dir, main_window, settings):
     for movies in path_list:
         if main_window['-CANCEL-']:
             break
-        start_update(movies, main_window)
+        start_update(movies, main_window, settings)
         movie_prog += 1
         main_window.write_event_value('-MOVEPROG-', movie_prog)

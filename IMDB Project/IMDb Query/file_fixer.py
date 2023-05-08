@@ -38,17 +38,25 @@ def run():
     BAR_MAX = 100000
     BAR_INC = 0
 
+    verb = False
+    force = False
+
+    if config.get(profile, 'output verbose') == 'True':
+        verb = True
+
+    if config.get(profile, 'force updates') == 'True':
+        force = True
+
     settings_tab = [
 
         [sG.Text("These logging settings determine the level of detail that is written to the log file.")],
         [sG.Text("Logging Info: 1 = Minimal, 2 = L1+Warnings, 3 = 2+Errors")],
         [sG.Text("Logging level:"), sG.Slider((1, 3), orientation='h', key='-LOGGING_LEVEL-',
                                               default_value=int(config.get(profile, 'logging level'))),
-         sG.Checkbox("Output Verbose Mode", key='-VERBOSE-', default=bool(config.get(profile, 'output verbose')))],
+         sG.Checkbox("Output Verbose Mode", key='-VERBOSE-', default=verb)],
 
         [sG.Text("Force Updates regardless of TMDb Tag:"), sG.Checkbox('Force updates', key='-UPDATE_FORCE-',
-                                                                       default=bool(
-                                                                           config.get(profile, 'force updates')))],
+                                                                       default=force)],
 
         [sG.Text("Log File Location:"), sG.Input(k='-LOG_LOCATION-', visible=True, expand_x=True, expand_y=False,
                                                  default_text=config.get(profile, 'log location')),
@@ -65,13 +73,14 @@ def run():
         [sG.Input(key='-FILE-', visible=True, expand_x=True, expand_y=False,
                   tooltip="Paste a folder as a directory here:", size=54),
          sG.FileBrowse("Choose File", target='-FILE-'), sG.FolderBrowse("Choose Folder", target='-FILE-'),
+         # TODO fix the file selector to handle multiple files.
          sG.Sizer(h_pixels=0, v_pixels=50)
          # sg.Sizer(h_pixels=30, v_pixels=75)
          ],
 
         [sG.Text("Folder update progress log:")],
         [sG.Multiline(size=(65, 10), expand_x=True, expand_y=True, key='-ACT-', reroute_stdout=True,
-                      horizontal_scroll=True, autoscroll=True, reroute_cprint=True)],
+                      horizontal_scroll=True, autoscroll=True, reroute_cprint=True)],  # TODO change reroute
 
         [sG.Text("Folder sorting not started.", key='-PDESC-')],
         [sG.ProgressBar(max_value=BAR_MAX, expand_x=True, expand_y=True, s=(43, 20), p=(5, 10), key='-PROG-')],
@@ -98,6 +107,9 @@ def run():
 
     window = sG.Window('Movie File Fixer', layout, icon=get_icon_base64(), resizable=False)  # TODO change to True.
 
+    del verb
+    del force
+
     while True:  # The Event Loop
         event, values = window.read()
 
@@ -106,6 +118,7 @@ def run():
                 break
 
             case '-RUN-':
+                # print("Found run case")
                 if running:
                     window['-ACT-'].update('There is an action currently running, please wait.', append=True)
                     continue
@@ -118,19 +131,26 @@ def run():
                 mkv = full_path.match("*.mkv")
 
                 running = True
-                window.write_event_value('-CANCEL-', False)
-                settings = [values.get('-VERBOSE-'), values.get('-UPDATE_FORCE-'), values.get('-THREAD_COUNT-'),
-                            values.get('-LOG_LOCATION-'), values.get('-LOGGING_LEVEL-')]
+                settings = {
+                    'verbose': values.get('-VERBOSE-'),
+                    'update-force': values.get('-UPDATE_FORCE-'),
+                    'threads': values.get('-THREAD_COUNT-'),
+                    'log-location': values.get('-LOG_LOCATION-'),
+                    'log-level': values.get('-LOGGING_LEVEL-')
+                }
 
                 if mkv:
                     # print("start single update", full_path, "|", full_path.parts)
+                    # print("Start single update")
                     window.perform_long_operation(lambda: start_update(full_path, window, settings), '-SUPDT-')
                 else:
                     # print("start folder update", full_path, "|", full_path.parts)
+                    # print("Start folder update")
                     window.perform_long_operation(lambda: folder_update(full_path, window, settings), '-FUPDT-')
 
             case '-CANCEL-':
-                window.write_event_value('-CANCEL-', True)
+                # window.write_event_value('-CANCEL-', True)
+                print("Cancel event occurred.")
 
             case '-SUPDT-' | '-FUPDT-':
                 running = False
@@ -153,21 +173,6 @@ def run():
                 sG.cprint(
                     f"There was an issue getting TMDB Data for the movie {values.get('-TMDBERR-')}. Metadata will "
                     f"still be fixed, however, title tag will not.", c='white on red')
-
-            case '-LOGGING_LEVEL-':
-                print("Value of LOGGING_LEVEL ", values.get('-LOGGING_LEVEL-'))
-
-            case '-VERBOSE-':
-                print("Verbose setting: ", values.get('-VERBOSE-'))
-
-            case '-UPDATE_FORCE-':
-                print("Update force state: ", values.get('-UPDATE_FORCE-'))
-
-            case '-LOG_LOCATION-':
-                print("Location of the log: ", values.get('-LOG_LOCATION-'))
-
-            case '-THREAD_COUNT-':
-                print("Number of threads to use: ", values.get('-THREAD_COUNT-'))
 
             case '-GENERAL_ERROR-':
                 error_message_details = values.get('-GENERAL_ERROR-')

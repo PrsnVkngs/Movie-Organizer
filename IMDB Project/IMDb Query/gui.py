@@ -369,7 +369,7 @@ def make_gui():
     # plotPref = StringVar()  # 7
     genre_pref = StringVar()  # 8
 
-    lowest_acceptable_rating = StringVar('')
+    lowest_acceptable_rating = StringVar(None)
 
     title_pref.set('true')
     release_pref.set('true')
@@ -381,11 +381,11 @@ def make_gui():
     # plotPref.set('true')
     genre_pref.set('true')
 
-    source_folder = StringVar('')
-    destination_folder = StringVar('')
-    field_preferences = StringVar('')
-    new_source_label = StringVar('')
-    new_destination_label = StringVar('')
+    source_folder = StringVar(None)
+    destination_folder = StringVar(None)
+    field_preferences = StringVar(None)
+    new_source_label = StringVar(None)
+    new_destination_label = StringVar(None)
 
     new_source_label.set('No new source selected.')
 
