@@ -1,32 +1,35 @@
 from pathlib import Path
 import PySimpleGUI as sG
 import configparser
+# import pyinstrument
 
-from update_movie_metadata import start_update, folder_update
+from update_movie_metadata import start_update, folder_update, batch_update
 from program_icon import get_icon_base64
+
+# profiler = pyinstrument.Profiler()
+
+
+def create_dir_file(path_str):
+    path = Path(path_str)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not path.is_file():
+        create_settings_file(path)
+    return path
+
+
+def read_config_file(path):
+    config = configparser.ConfigParser()
+    config.read(path)
+    return config
 
 
 def run():
-    settings_file = Path().home()
-    settings_file = settings_file / 'Documents/FileFixer'
-    if not settings_file.exists():
-        settings_file.mkdir(parents=True, exist_ok=True)
-    settings_file = settings_file / 'Settings'
-    if not settings_file.exists():
-        settings_file.mkdir(parents=True, exist_ok=True)
-
-    settings_file = settings_file / 'settings.ini'
-    if not settings_file.exists():
+    settings_file = create_dir_file(Path.home() / 'Documents/FileFixer/Settings/settings.ini')
+    config = read_config_file(settings_file)
+    profile = config.get('DEFAULT', 'profile', fallback=None)
+    if profile is None:
         create_settings_file(settings_file)
-
-    config = read_settings_file(settings_file)
-
-    try:
-        profile = config.get('DEFAULT', 'profile')
-
-    except configparser.NoOptionError:
-        create_settings_file(settings_file)
-        config = read_settings_file(settings_file)
+        config = read_config_file(settings_file)
         profile = config.get('DEFAULT', 'profile')
 
     sG.theme('DarkBlue')
@@ -38,14 +41,8 @@ def run():
     BAR_MAX = 100000
     BAR_INC = 0
 
-    verb = False
-    force = False
-
-    if config.get(profile, 'output verbose') == 'True':
-        verb = True
-
-    if config.get(profile, 'force updates') == 'True':
-        force = True
+    verb = config.getboolean(profile, 'output verbose')
+    force = config.getboolean(profile, 'force updates')
 
     settings_tab = [
 
@@ -72,7 +69,9 @@ def run():
 
         [sG.Input(key='-FILE-', visible=True, expand_x=True, expand_y=False,
                   tooltip="Paste a folder as a directory here:", size=54),
-         sG.FileBrowse("Choose File", target='-FILE-'), sG.FolderBrowse("Choose Folder", target='-FILE-'),
+         sG.FilesBrowse("Choose File(s)", target='-FILE-',
+                        file_types=(('Matroska Files', '*.mkv'), ('ALL Files', '*.* *'))),
+         sG.FolderBrowse("Choose Folder", target='-FILE-'),
          # TODO fix the file selector to handle multiple files.
          sG.Sizer(h_pixels=0, v_pixels=50)
          # sg.Sizer(h_pixels=30, v_pixels=75)
@@ -85,11 +84,12 @@ def run():
         [sG.Text("Folder sorting not started.", key='-PDESC-')],
         [sG.ProgressBar(max_value=BAR_MAX, expand_x=True, expand_y=True, s=(43, 20), p=(5, 10), key='-PROG-')],
 
-        [sG.Button("Run", key='-RUN-'), sG.Button("Cancel", key='-CANCEL-'), sG.Button("Clear Log", key='-CLR-'),
+        [sG.Button("Run", key='-RUN-'), sG.Button("Clear Log", key='-CLR-'),
          sG.Exit(),
          sG.Sizer(h_pixels=0, v_pixels=40)]
 
     ]
+    # """sG.Button("Cancel", key='-CANCEL-')"""
 
     layout = [
 
@@ -98,17 +98,16 @@ def run():
                 [
                     [sG.Tab("Main Tab", main_tab),
                      sG.Tab("Settings", settings_tab)]
-                ], pad=(3, 10)
+                ], pad=(3, 10), expand_x=True, expand_y=True
             ),
             sG.Sizegrip(k='-RESIZE-')
         ]
 
     ]
 
-    window = sG.Window('Movie File Fixer', layout, icon=get_icon_base64(), resizable=False)  # TODO change to True.
+    window = sG.Window('Movie File Fixer', layout, icon=get_icon_base64(), resizable=True)  # TODO change to True.
 
-    del verb
-    del force
+    # profiler.start()
 
     while True:  # The Event Loop
         event, values = window.read()
@@ -123,12 +122,22 @@ def run():
                     window['-ACT-'].update('There is an action currently running, please wait.', append=True)
                     continue
 
-                full_path = Path(values.get('-FILE-'))
+                path = values.get('-FILE-')
+                targets = []
+                multi_file = False
+                if ';' in path:
+                    multi_file = True
+                    for paths in str(path).split(';'):
+                        targets.append(Path(paths))
+                else:
+                    targets.append(Path(path))
 
-                if not (full_path.exists()):
-                    sG.cprint("Please enter a valid file name or folder.", colors='white on yellow')
+                # full_path = Path(values.get('-FILE-'))
 
-                mkv = full_path.match("*.mkv")
+                if not any(t.exists() for t in targets):
+                    sG.cprint("One or more of the files or folders entered does not exist.", colors='white on yellow')
+
+                mkv = targets[0].match("*.mkv")
 
                 running = True
                 settings = {
@@ -139,17 +148,19 @@ def run():
                     'log-level': values.get('-LOGGING_LEVEL-')
                 }
 
-                if mkv:
+                if multi_file:
+                    window.perform_long_operation(lambda: batch_update(targets, window, settings), '-FUPDT-')
+                elif mkv:
                     # print("start single update", full_path, "|", full_path.parts)
                     # print("Start single update")
-                    window.perform_long_operation(lambda: start_update(full_path, window, settings), '-SUPDT-')
+                    window.perform_long_operation(lambda: start_update(targets[0], window, settings), '-SUPDT-')
                 else:
                     # print("start folder update", full_path, "|", full_path.parts)
                     # print("Start folder update")
-                    window.perform_long_operation(lambda: folder_update(full_path, window, settings), '-FUPDT-')
+                    window.perform_long_operation(lambda: folder_update(targets[0], window, settings), '-FUPDT-')
 
             case '-CANCEL-':
-                # window.write_event_value('-CANCEL-', True)
+                window.write_event_value('-CANCEL-', True)
                 print("Cancel event occurred.")
 
             case '-SUPDT-' | '-FUPDT-':
@@ -180,6 +191,9 @@ def run():
 
             case '-CLR-':
                 window['-ACT-'].update('')
+
+    # profiler.stop()
+    # profiler.open_in_browser()
 
     window.close()
 

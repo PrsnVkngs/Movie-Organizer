@@ -35,8 +35,17 @@ subtitle_fns = {
 }
 
 
-def start_update(movie, main_window, settings):
+def process_tracks(track_info, track_type, edit_track_fn, track_fns):
+    cmd = ""
+    for track, info in enumerate(track_info):
+        to_do = [func for func in track_fns if func in info]
+        cmd += edit_track_fn(track + 1)
+        for item in to_do:
+            cmd += track_fns[item](info[item])
+    return cmd
 
+
+def start_update(movie, main_window, settings):
     print("Currently editing the movie: ", movie.name, " in directory: ", movie.parent)
 
     if has_tmdb_tag(movie.name) and not settings['update-force']:  # update force setting
@@ -46,7 +55,6 @@ def start_update(movie, main_window, settings):
                                                  "black on green"])
         print('\n')
         return None
-
 
     # print("getting movie info")
     movie_info = make_tmdb_call(movie.name)
@@ -60,63 +68,81 @@ def start_update(movie, main_window, settings):
         if settings[0]:
             main_window.write_event_value('-TMDBERR-', "Could not retrieve the name for: " + str(movie.name))
 
+
+    for track in track_info.values():
+        if track != 0:
+            for num, info in enumerate(track):
+                t_type = info.pop('track-type')
+                t_type = t_type[0].lower()
+                prop_cmd += f"--edit track:{t_type}{num + 1} "
+                for detail, value in info.items():
+                    prop_cmd += f"--set {detail}=\"{value}\" "
+
+        # # video tracks
+        # for track, info in enumerate(track_info['Video']):
+        #     video_to_do = [func for func in video_fns if func in info]
+        #     prop_cmd += e_video_track(track + 1)
+        #
+        #     for item in video_to_do:
+        #         prop_cmd += video_fns[item](info[item])
+        #
+        # # audio tracks
+        # for track, info in enumerate(track_info['Audio']):
+        #     audio_to_do = [func for func in audio_fns if func in info]
+        #     prop_cmd += e_audio_track(track + 1)
+        #
+        #     for item in audio_to_do:
+        #         prop_cmd += audio_fns[item](info[item])
+        #
+        # # subtitle tracks
+        # for track, info in enumerate(track_info['Subtitles']):
+        #     subtitle_to_do = [func for func in subtitle_fns if func in info]
+        #     prop_cmd += e_sub_track(track + 1)
+        #
+        #     for item in subtitle_to_do:
+        #         prop_cmd += subtitle_fns[item](info[item])
+
+    # print(prop_cmd)
+    result = 3
     try:
-        # video tracks
-        for track, info in enumerate(track_info[0]):
-            video_to_do = [func for func in video_fns if func in info]
-            prop_cmd += e_video_track(track + 1)
-
-            for item in video_to_do:
-                prop_cmd += video_fns[item](info[item])
-
-        # audio tracks
-        for track, info in enumerate(track_info[1]):
-            audio_to_do = [func for func in audio_fns if func in info]
-            prop_cmd += e_audio_track(track + 1)
-
-            for item in audio_to_do:
-                prop_cmd += audio_fns[item](info[item])
-
-        # subtitle tracks
-        for track, info in enumerate(track_info[2]):
-            subtitle_to_do = [func for func in subtitle_fns if func in info]
-            prop_cmd += e_sub_track(track + 1)
-
-            for item in subtitle_to_do:
-                prop_cmd += subtitle_fns[item](info[item])
-
-        # print(prop_cmd)
         result = subprocess.run(prop_cmd, capture_output=True, creationflags=CREATE_NO_WINDOW)
-
-        match result.returncode:
-            case 0:
-                process_result = "Edit successful."
-            case 2:
-                process_result = "Edit unsuccessful, file likely isn't an mkv."
-            case default:
-                process_result = "Unknown process code, likely that an error was thrown."
-
-        print("MKV Prop Edit Result: ", process_result)
-
-        # print("Finish prop cmd\n\nDone!!")
-        # print("Starting file edit for movie: ", movie)
-
-        if (movie.name.find("tmdb") == -1) and movie_info:
-            src = Path(movie)
-            new_name = movie.name.split('.')
-            new_name = new_name[0] + " [tmdbid=" + str(movie_info['id']) + "]" + "." + new_name[1]
-            dst = src.parent / new_name
-
-            src.rename(dst)
-
-        print('\n')
-
-    except BaseException as err:
+    except FileNotFoundError as err:
         if settings['verbose']:
             print(f"Error while performing update: {err=}, {type(err)=}")
-            main_window.write_event_value(key='-GENERAL_ERROR-', value=["Check if MKVToolNix and MediaInfo Installation"
-                                                                    "Locations are on the system environment "
-                                                                    "variable.", "black on yellow"])
+            main_window.write_event_value(key='-GENERAL_ERROR-',
+                                          value=["Check if MKVToolNix and MediaInfo Installation"
+                                                 "Locations are on the system environment "
+                                                 "variable.", "black on yellow"])
+    except BaseException as err:
+        if settings['verbose']:
+            print(f"Error while editing the metadata: {err=}, {type(err)=}")
+            main_window.write_event_value(key='-GENERAL_ERROR-',
+                                          value=["Generic error occurred while editing metadata.", "black on yellow"])
+
+    match result.returncode:
+        case 0:
+            process_result = "Edit successful."
+        case 1:
+            process_result = "A minor error occurred but edits successful."
+        case 2:
+            process_result = "Edit unsuccessful, major error occurred."
+        case default:
+            process_result = "Unknown process code, likely that an error was thrown."
+
+    print("MKV Prop Edit Result: ", process_result)
+
+    # print("Finish prop cmd\n\nDone!!")
+    # print("Starting file edit for movie: ", movie)
+
+    if (movie.name.find("tmdb") == -1) and movie_info:
+        src = Path(movie)
+        new_name = movie.name.split('.')
+        new_name = new_name[0] + " [tmdbid=" + str(movie_info['id']) + "]" + "." + new_name[1]
+        dst = src.parent / new_name
+
+        src.rename(dst)
+
+    print('\n')
 
 
     # result = subprocess.run(prop_cmd, capture_output=True)
@@ -124,7 +150,6 @@ def start_update(movie, main_window, settings):
 
 
 def folder_update(raw_dir, main_window, settings):
-
     directory = Path(raw_dir)
 
     movies_to_update = directory.rglob("*.mkv")
@@ -142,8 +167,24 @@ def folder_update(raw_dir, main_window, settings):
     print("about to go through files")
 
     for movies in path_list:
-        if main_window['-CANCEL-']:
-            break
+        # if main_window['-CANCEL-']:
+        #     break
+        start_update(movies, main_window, settings)
+        movie_prog += 1
+        main_window.write_event_value('-MOVEPROG-', movie_prog)
+
+
+def batch_update(targets, main_window, settings):
+
+    main_window.write_event_value('-MOVCOUNT-', len(targets))
+
+    movie_prog = 0
+
+    print(targets)
+
+    for movies in targets:
+        # if main_window['-CANCEL-']:
+        #     break
         start_update(movies, main_window, settings)
         movie_prog += 1
         main_window.write_event_value('-MOVEPROG-', movie_prog)
