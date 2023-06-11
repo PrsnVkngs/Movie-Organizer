@@ -6,8 +6,11 @@ import configparser
 from update_movie_metadata import start_update, folder_update, batch_update
 from program_icon import get_icon_base64
 
+
 # profiler = pyinstrument.Profiler()
 
+# command to compile:
+# python -m nuitka --disable-console --output-filename='FileFixer' --output-dir='distribution' --enable-plugin=tk-inter --enable-plugin=multiprocessing --follow-imports --standalone '.\IMDB Project\IMDb Query\file_fixer.py'
 
 def create_dir_file(path_str):
     path = Path(path_str)
@@ -44,6 +47,8 @@ def run():
     verb = config.getboolean(profile, 'output verbose')
     force = config.getboolean(profile, 'force updates')
 
+    show_threads = False
+
     settings_tab = [
 
         [sG.Text("These logging settings determine the level of detail that is written to the log file.")],
@@ -59,8 +64,9 @@ def run():
                                                  default_text=config.get(profile, 'log location')),
          sG.FolderBrowse("Choose Folder", target='-LOG_LOCATION-')],
 
-        [sG.Text("Number of threads:"), sG.Slider((1, 4), orientation='h', key='-THREAD_COUNT-',
-                                                  default_value=int(config.get(profile, 'thread count')))]
+        [sG.Text("Number of threads:", visible=show_threads),
+         sG.Slider((1, 4), orientation='h', key='-THREAD_COUNT-', visible=show_threads,
+                   default_value=int(config.get(profile, 'thread count')))]
     ]
 
     main_tab = [
@@ -114,6 +120,17 @@ def run():
 
         match event:
             case sG.WIN_CLOSED | 'Exit':
+                try:
+                    settings = {
+                        'verbose': values.get('-VERBOSE-'),
+                        'update-force': values.get('-UPDATE_FORCE-'),
+                        'threads': values.get('-THREAD_COUNT-'),
+                        'log-location': values.get('-LOG_LOCATION-'),
+                        'log-level': values.get('-LOGGING_LEVEL-')
+                    }
+                    write_settings_file(settings_file, settings)
+                except AttributeError:
+                    pass
                 break
 
             case '-RUN-':
@@ -205,7 +222,19 @@ def read_settings_file(file_path):
     return config
 
 
-def write_settings_file(file_path):
+def write_settings_file(file_path, values):
+    parser = configparser.ConfigParser()
+    parser.read(file_path)
+
+    parser['DEFAULT']['logging level'] = str(int(values['log-level']))
+    parser['DEFAULT']['output verbose'] = str(values['verbose'])
+    parser['DEFAULT']['force updates'] = str(values['update-force'])
+    parser['DEFAULT']['thread count'] = str(int(values['threads']))
+    parser['DEFAULT']['log location'] = str(values['log-location'])
+
+    with open(file_path, 'w') as cfg:
+        parser.write(cfg)
+
     return None
 
 

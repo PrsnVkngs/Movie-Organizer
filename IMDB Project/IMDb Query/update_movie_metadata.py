@@ -68,7 +68,7 @@ def start_update(movie, main_window, settings):
         if settings[0]:
             main_window.write_event_value('-TMDBERR-', "Could not retrieve the name for: " + str(movie.name))
 
-
+    # print("constructing mkv prop edit command.")
     for track in track_info.values():
         if track != 0:
             for num, info in enumerate(track):
@@ -77,30 +77,6 @@ def start_update(movie, main_window, settings):
                 prop_cmd += f"--edit track:{t_type}{num + 1} "
                 for detail, value in info.items():
                     prop_cmd += f"--set {detail}=\"{value}\" "
-
-        # # video tracks
-        # for track, info in enumerate(track_info['Video']):
-        #     video_to_do = [func for func in video_fns if func in info]
-        #     prop_cmd += e_video_track(track + 1)
-        #
-        #     for item in video_to_do:
-        #         prop_cmd += video_fns[item](info[item])
-        #
-        # # audio tracks
-        # for track, info in enumerate(track_info['Audio']):
-        #     audio_to_do = [func for func in audio_fns if func in info]
-        #     prop_cmd += e_audio_track(track + 1)
-        #
-        #     for item in audio_to_do:
-        #         prop_cmd += audio_fns[item](info[item])
-        #
-        # # subtitle tracks
-        # for track, info in enumerate(track_info['Subtitles']):
-        #     subtitle_to_do = [func for func in subtitle_fns if func in info]
-        #     prop_cmd += e_sub_track(track + 1)
-        #
-        #     for item in subtitle_to_do:
-        #         prop_cmd += subtitle_fns[item](info[item])
 
     # print(prop_cmd)
     result = 3
@@ -129,7 +105,8 @@ def start_update(movie, main_window, settings):
         case default:
             process_result = "Unknown process code, likely that an error was thrown."
 
-    print("MKV Prop Edit Result: ", process_result)
+    if settings['verbose']:
+        print("MKV Prop Edit Result: ", process_result)
 
     # print("Finish prop cmd\n\nDone!!")
     # print("Starting file edit for movie: ", movie)
@@ -143,7 +120,6 @@ def start_update(movie, main_window, settings):
         src.rename(dst)
 
     print('\n')
-
 
     # result = subprocess.run(prop_cmd, capture_output=True)
     # print(result.stdout)
@@ -175,7 +151,6 @@ def folder_update(raw_dir, main_window, settings):
 
 
 def batch_update(targets, main_window, settings):
-
     main_window.write_event_value('-MOVCOUNT-', len(targets))
 
     movie_prog = 0
