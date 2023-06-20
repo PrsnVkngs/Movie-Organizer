@@ -111,7 +111,7 @@ def run():
 
     ]
 
-    window = sG.Window('Movie File Fixer', layout, icon=get_icon_base64(), resizable=True)  # TODO change to True.
+    window = sG.Window('Movie File Fixer v1.3.1', layout, icon=get_icon_base64(), resizable=True)  # TODO change to True.
 
     # profiler.start()
 

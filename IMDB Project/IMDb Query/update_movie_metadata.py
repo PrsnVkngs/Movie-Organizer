@@ -1,6 +1,7 @@
 from _winapi import CREATE_NO_WINDOW
 from pathlib import Path
 import logging
+from json import JSONDecodeError
 
 from get_movie_details_from_file import has_tmdb_tag
 from get_movie_metadata import get_track_info
@@ -57,9 +58,15 @@ def start_update(movie, main_window, settings):
         return None
 
     # print("getting movie info")
-    movie_info = make_tmdb_call(movie.name)
+    try:
+        movie_info = make_tmdb_call(movie.name)
+    except JSONDecodeError:
+        main_window.write_event_value(key='-GENERAL_ERROR-',
+                                      value=[f"Error retrieving movie info for the movie: {movie.name}"
+                                             f" from TMDB.", "black on red"])
+        return
     # print("getting track info")
-    track_info = get_track_info(movie)
+    track_info, xml_info = get_track_info(movie)
 
     if movie_info:
         prop_cmd = f'{mp_s} \"{movie.absolute()}\" --set \"title={movie_info.get("title")}\" '
