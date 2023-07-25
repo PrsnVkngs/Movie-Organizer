@@ -9,8 +9,12 @@ from program_icon import get_icon_base64
 
 # profiler = pyinstrument.Profiler()
 
-# command to compile:
+# command to compile with nuitka:
 # python -m nuitka --disable-console --output-filename='FileFixer' --output-dir='distribution' --enable-plugin=tk-inter --enable-plugin=multiprocessing --follow-imports --standalone '.\IMDB Project\IMDb Query\file_fixer.py'
+
+# command to compile with pyinstaller, just make sure to change the version name.
+# pyinstaller -wF '.\IMDB Project\IMDb Query\file_fixer.py' -i 'C:\Users\Crypto Storage\PycharmProjects\Movie-Organizer\filefixericon.ico' -n 'file_fixer_1_3_3.exe'
+
 
 def create_dir_file(path_str):
     path = Path(path_str)
@@ -46,6 +50,7 @@ def run():
 
     verb = config.getboolean(profile, 'output verbose')
     force = config.getboolean(profile, 'force updates')
+    compute = config.getboolean(profile, 'compute stats')
 
     show_threads = False
 
@@ -59,6 +64,9 @@ def run():
 
         [sG.Text("Force Updates regardless of TMDb Tag:"), sG.Checkbox('Force updates', key='-UPDATE_FORCE-',
                                                                        default=force)],
+
+        [sG.Text("Compute Additional Track Statistics:"), sG.Checkbox('Compute Statistics', key='-STATS-',
+                                                                      default=compute)],
 
         [sG.Text("Log File Location:"), sG.Input(k='-LOG_LOCATION-', visible=True, expand_x=True, expand_y=False,
                                                  default_text=config.get(profile, 'log location')),
@@ -111,7 +119,7 @@ def run():
 
     ]
 
-    window = sG.Window('Movie File Fixer v1.3.1', layout, icon=get_icon_base64(), resizable=True)  # TODO change to True.
+    window = sG.Window('Movie File Fixer v1.3.4', layout, icon=get_icon_base64(), resizable=True)  # TODO change to True.
 
     # profiler.start()
 
@@ -126,7 +134,8 @@ def run():
                         'update-force': values.get('-UPDATE_FORCE-'),
                         'threads': values.get('-THREAD_COUNT-'),
                         'log-location': values.get('-LOG_LOCATION-'),
-                        'log-level': values.get('-LOGGING_LEVEL-')
+                        'log-level': values.get('-LOGGING_LEVEL-'),
+                        'stats': values.get('-STATS-')
                     }
                     write_settings_file(settings_file, settings)
                 except AttributeError:
@@ -162,7 +171,8 @@ def run():
                     'update-force': values.get('-UPDATE_FORCE-'),
                     'threads': values.get('-THREAD_COUNT-'),
                     'log-location': values.get('-LOG_LOCATION-'),
-                    'log-level': values.get('-LOGGING_LEVEL-')
+                    'log-level': values.get('-LOGGING_LEVEL-'),
+                    'stats': values.get('-STATS-')
                 }
 
                 if multi_file:
@@ -231,6 +241,7 @@ def write_settings_file(file_path, values):
     parser['DEFAULT']['force updates'] = str(values['update-force'])
     parser['DEFAULT']['thread count'] = str(int(values['threads']))
     parser['DEFAULT']['log location'] = str(values['log-location'])
+    parser['DEFAULT']['compute stats'] = str(values['stats'])
 
     with open(file_path, 'w') as cfg:
         parser.write(cfg)
@@ -249,6 +260,7 @@ def create_settings_file(file_path):
         'Thread Count': 1,
         'Output Verbose': False,
         'Force Updates': False,
+        'Compute Stats': False,
         'Log Location': default_log,
         'Profile': 'DEFAULT'
     }

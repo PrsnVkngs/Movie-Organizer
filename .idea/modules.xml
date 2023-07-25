@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://O:/GitHub/FlixFixer/.idea/FlixFixer.iml" filepath="O:/GitHub/FlixFixer/.idea/FlixFixer.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Movie-Organizer.iml" filepath="$PROJECT_DIR$/.idea/Movie-Organizer.iml" />
     </modules>
   </component>

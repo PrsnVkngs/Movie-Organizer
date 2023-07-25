@@ -1,21 +1,8 @@
-# import pprint
 from pathlib import Path
 
 from pymediainfo import MediaInfo as mI
 
 import xml_builder
-
-# desired_info = {
-#
-#     "Video": ['codec_id', 'commercial_name', 'sampled_width', 'sampled_height'],
-#     "Audio": ['codec_id', 'commercial_name', 'language', 'channel_s', 'sampling_rate', 'bit_depth'],
-#     "Subtitles": ['codec_id', 'commercial_name', 'language'],
-#
-# }
-
-# unwanted_keys = ['other_', 'count', 'settings', '__', '_url', 'colour', '_version', 'transfer_', 'kind_of_stream',
-#                  'stream_identifier', 'streamorder', 'track_id', 'unique_id', 'format_info', 'format_profile',
-#                  'internet_media_type', 'duration', 'bit_rate']
 
 key_filter = ['track_type', 'count', 'duration', 'forced', 'stream_identifier', 'streamorder',
               'count_of_stream_of_this_kind', 'default', 'kind_of_stream', 'lfeon', 'stream_identifier',
@@ -40,8 +27,7 @@ translations = {
 
 def filter_track(track_data):
     track_type = track_data['track_type']
-    # negative filter
-    # filtered_track = {key.replace('_', '-'): value for key, value in track_data.items() if not any(unwanted in key for unwanted in unwanted_keys)}
+
     match track_type:
         case 'Video':
             if 'chroma_subsampling' in track_data:
@@ -50,10 +36,16 @@ def filter_track(track_data):
                 track_data['chroma_subsample_horizontal'] = chroma[1]
                 track_data['chroma_subsample_vertical'] = chroma[2]
                 track_data.pop('bit_depth')
+                track_data[
+                    'name'] = f"{track_data['commercial_name']} [{track_data['other_bit_rate'][0]}] ({track_data['other_frame_rate'][0]})"
 
         case 'Audio':
             if 'title' in track_data:
                 track_data.pop('title')
+            track_data[
+                'name'] = f"{track_data['commercial_name']} [{track_data['other_bit_rate'][0]}] ({track_data['other_sampling_rate'][0]})"
+            # print(track_data['commercial_name'])
+            # if "Atmos" in
 
     for old_key in set(translations.keys()).intersection(track_data.keys()):
         key_value = track_data.pop(old_key)
@@ -66,6 +58,8 @@ def filter_track(track_data):
     # pp = pprint.PrettyPrinter()
     xml_data = {key: track_data[key] for key in filter_keys if (key.replace('_', '-') not in filtered_track
                                                                 and key not in key_filter)}
+    xml_data['trackuid'] = xml_data.pop('unique_id')
+    # xml_data['unique_id'] = trackuid
     # pp.pprint(xml_data)
     return filtered_track, xml_data
 
@@ -78,26 +72,19 @@ def get_track_info(path_to):
     Video track is element 4, Audio track is element 5, Text track is element 6. There will be a string saying "not
     available" if media info does not find a track for that type.
     """
-    # print('parsing path to string')
-    # p = path_to.absolute()
-    # print('retrieving info from media info')
     mediainfo_dat = mI.parse(path_to.absolute())
-
-    # for t in mediainfo_dat.tracks:
-    # f_t = {key: value for key, value in t.to_data().items() if 'other' not in key}
-    # pp.pprint(f_t)
 
     track_data = {'Video': [], 'Audio': [], 'Subtitles': []}
     xml_data = {}
 
     # print('constructing track info')
-    for track in mediainfo_dat.tracks:
-        track_type = track.track_type
+    for tracks in mediainfo_dat.tracks:
+        track_type = tracks.track_type
         if track_type in track_data:
-            trad, xml = filter_track(track.to_data())
+            trad, xml_d = filter_track(tracks.to_data())
             track_data[track_type].append(trad)
             if track_type == 'Video' or track_type == 'Audio':
-                xml_data[track_type] = xml
+                xml_data[track_type] = xml_d
 
     for track_type in track_data:
         if not track_data[track_type]:
@@ -129,8 +116,8 @@ if __name__ == '__main__':
                 for detail, value in info.items():
                     prop_cmd += f"--set {detail}=\"{value}\" "
 
-    video_xml = xml_builder.MatroskaTagger()
-    audio_xml = xml_builder.MatroskaTagger()
+    video_xml = xml_builder.MatroskaTagger(track_uid=xml['Video'].pop('trackuid'))
+    audio_xml = xml_builder.MatroskaTagger(track_uid=xml['Audio'].pop('trackuid'))
 
     for tag, detail in xml['Video'].items():
         video_xml.add_tag(str(tag).upper().strip(), str(detail).strip())
@@ -138,7 +125,7 @@ if __name__ == '__main__':
     for tag, detail in xml['Audio'].items():
         audio_xml.add_tag(str(tag).upper().strip(), str(detail).strip())
 
-    # video_xml.write_to_file('fresh_vid.xml', 'O:/Movie/mkvpropedit-runs')
+    video_xml.write_to_file('fresh_vid.xml', 'O:/Movie/mkvpropedit-runs')
     audio_xml.write_to_file('fresh_aud.xml', 'O:/Movie/mkvpropedit-runs')
 
     # pp = pprint.PrettyPrinter(indent=4)

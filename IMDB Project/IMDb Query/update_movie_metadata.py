@@ -2,11 +2,13 @@ from _winapi import CREATE_NO_WINDOW
 from pathlib import Path
 import logging
 from json import JSONDecodeError
+from tempfile import NamedTemporaryFile
 
 from get_movie_details_from_file import has_tmdb_tag
 from get_movie_metadata import get_track_info
 from get_tmdb_data import make_tmdb_call
 from mkv_prop_edit import *
+from xml_builder import MatroskaTagger
 
 mp_s = 'mkvpropedit'
 video_fns = {
@@ -96,11 +98,13 @@ def start_update(movie, main_window, settings):
                                           value=["Check if MKVToolNix and MediaInfo Installation"
                                                  "Locations are on the system environment "
                                                  "variable.", "black on yellow"])
+        return
     except BaseException as err:
         if settings['verbose']:
             print(f"Error while editing the metadata: {err=}, {type(err)=}")
             main_window.write_event_value(key='-GENERAL_ERROR-',
                                           value=["Generic error occurred while editing metadata.", "black on yellow"])
+        return
 
     match result.returncode:
         case 0:
@@ -113,7 +117,70 @@ def start_update(movie, main_window, settings):
             process_result = "Unknown process code, likely that an error was thrown."
 
     if settings['verbose']:
-        print("MKV Prop Edit Result: ", process_result)
+        print("Movie base info edit result: ", process_result)
+
+    # Start the tag additions here:
+    with NamedTemporaryFile(mode='w+', delete=False, suffix='.xml') as video, NamedTemporaryFile(mode='w+', delete=False, suffix='.xml') as audio:
+        # create the matroska tagger classes
+        video_xml = MatroskaTagger(track_uid=xml_info['Video'].pop('trackuid'))
+        audio_xml = MatroskaTagger(track_uid=xml_info['Audio'].pop('trackuid'))
+
+        # populate the matroska taggers with the info.
+        video_xml.parse_dict(xml_info['Video'])
+        audio_xml.parse_dict(xml_info['Audio'])
+
+        # write their contents to the file
+        video.write(video_xml.get_xml_string())
+        video.flush()
+        audio.write(audio_xml.get_xml_string())
+        audio.flush()
+
+        tag_comm = f'{mp_s} \"{movie.absolute()}\" --tags track:v1:\"{video.name}\" --tags track:a1:\"{audio.name}\"'
+        # print(tag_comm)
+
+        try:
+            tag_result = subprocess.run(tag_comm, capture_output=True, creationflags=CREATE_NO_WINDOW)
+
+            match tag_result.returncode:
+                case 0:
+                    process_result = "Edit successful."
+                case 1:
+                    process_result = "A minor error occurred but edits successful."
+                case 2:
+                    process_result = f"Edit unsuccessful, major error occurred. Additional info {tag_result.stdout}"
+                case default:
+                    process_result = "Unknown process code, likely that an error was thrown."
+
+            print("Additional tags addition result: ", process_result)
+
+        except FileNotFoundError as err:
+            if settings['verbose']:
+                print(f"Error while performing update: {err=}, {type(err)=}")
+                main_window.write_event_value(key='-GENERAL_ERROR-',
+                                              value=["Check if MKVToolNix and MediaInfo Installation"
+                                                     "Locations are on the system environment "
+                                                     "variable.", "black on yellow"])
+            return
+
+    # end the edits using the temp files
+
+    # TODO compute the tags based on user setting:
+    if settings['stats']:
+        compute_cmd = f'{mp_s} \"{movie.absolute()}\" --add-track-statistics-tags'
+
+        stats_result = subprocess.run(compute_cmd, capture_output=True, creationflags=CREATE_NO_WINDOW)
+
+        match stats_result.returncode:
+            case 0:
+                process_result = "Computation successful."
+            case 1:
+                process_result = "A minor error occurred but stats written to file."
+            case 2:
+                process_result = f"Write to file unsuccessful, major error occurred. Additional details: {stats_result.stdout}"
+            case default:
+                process_result = "Unknown process code, likely that an error was thrown."
+
+        print("Additional stats computation result: ", process_result)
 
     # print("Finish prop cmd\n\nDone!!")
     # print("Starting file edit for movie: ", movie)

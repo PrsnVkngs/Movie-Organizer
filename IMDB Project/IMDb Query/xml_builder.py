@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 from xml.dom.minidom import parseString
 from xml.etree.ElementTree import Element, SubElement, tostring
 import pathlib
@@ -17,9 +18,13 @@ class MatroskaTagger:
     xml_root: Element
     tags: Element
 
-    def __init__(self):
+    def __init__(self, track_uid: Optional[str] = None):
         self.xml_root = Element('Tags')
         self.tags = SubElement(self.xml_root, 'Tag')
+        if track_uid is not None:
+            uid_f = SubElement(self.tags, 'Targets')
+            uid_v = SubElement(uid_f, 'TrackUID')
+            uid_v.text = track_uid
 
     def add_tag(self, tag_name: str, tag_value: str):
         tag = SubElement(self.tags, 'Simple')
@@ -37,9 +42,13 @@ class MatroskaTagger:
                 value = SubElement(tag, 'String')
                 value.text = tag_value
 
+    def parse_dict(self, dictionary: dict):
+        for tag, detail in dictionary.items():
+            self.add_tag(str(tag).upper().strip(), str(detail).strip())
+
     def get_xml_string(self):
         xml_str = tostring(self.xml_root, 'utf-8')
-        pretty_xml = parseString(xml_str).toprettyxml(indent="  ")
+        pretty_xml = remove_first_line(parseString(xml_str).toprettyxml(indent="  "))
         return pretty_xml
 
     def write_to_file(self, filename, directory):
